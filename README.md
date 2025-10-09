@@ -1,94 +1,100 @@
-# 🤝 CollabSpace
+# CareerRoutine iOS App (MVP)
 
-**CollabSpace** is a collaborative workspace management web application designed to streamline project organization and user collaboration. It features account authentication, workspace creation, user role management, and responsive UI built with modern web technologies.
+CareerRoutine helps computer science students and new grads build a **personalized weekly routine** and **interview prep plan** using OpenAI — all while keeping data 100% local to the device.  
 
----
-
-## 🛠 Tech Stack
-
-- **Frontend**: React, Material UI
-- **Backend**: Node.js, Express
-- **Database**: PostgreSQL
-- **Authentication**: JWT-based
-- **API Documentation**: OpenAPI/Swagger
+The backend is a lightweight Node.js API that simply forwards structured prompts to OpenAI.  
+No accounts, no cloud, no data storage.
 
 ---
 
-## 🌟 Features
+## 🧠 MVP Overview
 
-- 🔐 Secure login with hashed password storage
-- 🧑‍💼 Workspace and user management
-- 🧭 Role-based interface
-- 🔄 Session handling via JWT tokens
-- ⚡ Fast PostgreSQL queries using JSONB columns
+**Goal:**  
+Generate a Monday–Friday routine and interview prep plan in under two minutes.  
+All data stays **on the user’s device**.
 
----
-
-## 🧪 Seeded Test Accounts
-
-Use these accounts to sign in during development/testing:
-
-| Email                                      | Password    | Name              |
-| ------------------------------------------ | ----------- | ----------------- |
-| [molly@books.com](mailto\:molly@books.com) | mollymember | Andrew Dellaringa |
-| [anna@books.com](mailto\:anna@books.com)   | annaadmin   | Anna Hendo        |
+**Stack:**
+- **Frontend:** Swift / SwiftUI  
+- **Backend:** Node.js + Express  
+- **Storage:** Local JSON files (no database)  
+- **AI:** OpenAI API  
 
 ---
 
-## 🧰 Database Setup
+## ✨ Core Features
 
-PostgreSQL database is seeded with test data:
+### 1. Onboarding & Profile  
+Users enter:
+- Name  
+- Stage (e.g. “2nd Year”, “Recent Grad”)  
+- Target role (e.g. “iOS SWE”)  
+- Time budget (hours per day)  
+- Available days and constraints  
 
-- 2 Users
-- 3 Workspaces: Project Alpha, Project Beta, Project Charlie
-- Pre-linked workspace-user relationships
-
-Each project has both users as members.
-
----
-
-## 🚀 Getting Started
-
-1. **Clone the repo**
-
-```bash
-git clone https://github.com/yourusername/collabspace.git
-cd collabspace
-```
-
-2. **Backend Setup**
-
-```bash
-cd backend
-npm install
-npm start
-```
-
-3. **Frontend Setup**
-
-```bash
-cd frontend
-npm install
-npm start
-```
-
-4. **Environment Variables** Make sure to configure your `.env` file for the backend with your database credentials and JWT secret.
+Saved locally as `profile.json`.
 
 ---
 
-## 🛡 Authentication
+### 2. Generate Routine  
+Tap **Generate Plan** → calls backend → OpenAI returns structured JSON:
+- Time-boxed blocks (Mon–Fri)
+- Daily tasks  
+- Weekly milestones  
+- Recommended resources  
 
-CollabSpace uses JWT to protect API routes. Users must log in to receive a token, which is then validated on all protected routes.
+Saved locally as a versioned file (`plan_YYYY-MM-DD.json`).
 
 ---
 
-## 📄 License
-
-MIT
+### 3. Daily Checklist  
+View “Today” tab → see tasks → mark **Done / Skipped**.  
+Progress + streak saved to `progress.json`.
 
 ---
 
-## ✍️ Author
+### 4. Interview Prep Pack  
+One-tap generation of:
+- Topic ladder (DS&A, iOS, systems)  
+- Weekly drill plan  
+- Starter questions  
+- Resource links  
 
-Created by **Andrew DellAringa**
+---
 
+### 5. Quick Re-Rolls  
+Regenerate only parts of your plan (e.g., time blocks or resources)  
+without deleting your whole week.
+
+---
+
+## 🧩 Architecture
+
+### iOS (Swift / SwiftUI)
+- Tabs: **Onboarding**, **Week**, **Today**, **Prep**, **Settings**
+- Stores JSON in app’s local Documents folder  
+- `UserDefaults` for small preferences  
+- Optional Keychain storage for user’s API key  
+
+### Node.js (Express)
+- **Stateless backend**
+- Endpoints:
+  - `POST /generate/routine`
+  - `POST /generate/prep`
+  - `POST /reroll/:section`
+- Each route builds a JSON-based prompt and calls OpenAI.
+
+---
+
+## 🗂️ Example Data
+
+**`profile.json`**
+```json
+{
+  "name": "Andrew",
+  "stage": "recent_grad",
+  "targetRole": "iOS Software Engineer",
+  "timeBudgetHoursPerDay": 3,
+  "availableDays": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+  "constraints": ["no weekends"],
+  "updatedAt": "2025-10-06T21:00:00Z"
+}
