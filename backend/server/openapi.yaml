@@ -1,0 +1,474 @@
+openapi: 3.0.3
+info:
+  title: CareerRoutine API
+  description: |
+    Stateless Node.js Express API for generating personalized interview preparation routines.
+    Uses OpenAI with strict JSON schema validation. No database or server-side persistence.
+  version: 1.0.0
+  contact:
+    name: API Support
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8081
+    description: Development server
+  - url: https://api.careerroutine.com
+    description: Production server
+
+tags:
+  - name: health
+    description: Health check endpoints
+  - name: generate
+    description: Content generation endpoints
+  - name: reroll
+    description: Section regeneration endpoints
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Returns server status
+      tags:
+        - health
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /generate/routine:
+    post:
+      summary: Generate weekly routine
+      description: Generates a personalized weekly interview prep routine (Mon-Fri)
+      tags:
+        - generate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - profile
+              properties:
+                profile:
+                  $ref: '#/components/schemas/Profile'
+                preferences:
+                  type: object
+                  description: Optional generation preferences
+      responses:
+        '200':
+          description: Routine generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - plan
+                properties:
+                  plan:
+                    $ref: '#/components/schemas/Plan'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /generate/prep:
+    post:
+      summary: Generate prep pack
+      description: Generates a comprehensive interview preparation pack
+      tags:
+        - generate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - profile
+              properties:
+                profile:
+                  $ref: '#/components/schemas/Profile'
+      responses:
+        '200':
+          description: Prep pack generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - prep
+                properties:
+                  prep:
+                    $ref: '#/components/schemas/Prep'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+  /reroll/{section}:
+    post:
+      summary: Reroll plan section
+      description: |
+        Regenerates a specific section of an existing plan.
+        Valid sections: timeBlocks, resources, dailyTasks
+      tags:
+        - reroll
+      parameters:
+        - name: section
+          in: path
+          required: true
+          description: Section to regenerate
+          schema:
+            type: string
+            enum:
+              - timeBlocks
+              - resources
+              - dailyTasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - profile
+                - currentPlan
+              properties:
+                profile:
+                  $ref: '#/components/schemas/Profile'
+                currentPlan:
+                  $ref: '#/components/schemas/Plan'
+      responses:
+        '200':
+          description: Section regenerated successfully
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      timeBlocks:
+                        $ref: '#/components/schemas/TimeBlocks'
+                  - type: object
+                    properties:
+                      resources:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Resource'
+                  - type: object
+                    properties:
+                      dailyTasks:
+                        $ref: '#/components/schemas/DailyTasks'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
+
+components:
+  schemas:
+    Profile:
+      type: object
+      required:
+        - name
+        - stage
+        - targetRole
+        - timeBudgetHoursPerDay
+        - availableDays
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+          example: Andrew
+        stage:
+          type: string
+          minLength: 2
+          maxLength: 40
+          example: recent_grad
+        targetRole:
+          type: string
+          minLength: 2
+          maxLength: 60
+          example: iOS Software Engineer
+        timeBudgetHoursPerDay:
+          type: number
+          minimum: 0.5
+          maximum: 12
+          example: 3
+        availableDays:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+              - Mon
+              - Tue
+              - Wed
+              - Thu
+              - Fri
+              - Sat
+              - Sun
+          example:
+            - Mon
+            - Tue
+            - Wed
+            - Thu
+            - Fri
+        constraints:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          example:
+            - no weekends
+
+    Plan:
+      type: object
+      required:
+        - weekOf
+        - timeBlocks
+        - dailyTasks
+        - milestones
+        - resources
+        - version
+      properties:
+        weekOf:
+          type: string
+          pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+          example: '2025-10-06'
+        timeBlocks:
+          $ref: '#/components/schemas/TimeBlocks'
+        dailyTasks:
+          $ref: '#/components/schemas/DailyTasks'
+        milestones:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 120
+          example:
+            - Complete 10 medium LeetCode problems
+            - Build and deploy a SwiftUI app
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Resource'
+        version:
+          type: integer
+          minimum: 1
+          example: 1
+
+    TimeBlocks:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/TimeBlock'
+      example:
+        Mon:
+          - start: '09:00'
+            end: '09:45'
+            label: 'DS&A: Arrays & Strings'
+          - start: '10:00'
+            end: '10:45'
+            label: 'Swift Fundamentals'
+
+    TimeBlock:
+      type: object
+      required:
+        - start
+        - end
+        - label
+      properties:
+        start:
+          type: string
+          pattern: '^[0-2][0-9]:[0-5][0-9]$'
+          example: '09:00'
+        end:
+          type: string
+          pattern: '^[0-2][0-9]:[0-5][0-9]$'
+          example: '09:45'
+        label:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: 'DS&A: Arrays & Strings'
+
+    DailyTasks:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+          minLength: 1
+          maxLength: 120
+      example:
+        Mon:
+          - Complete 2 LC Easy problems on arrays
+          - Review Swift optionals
+          - Apply to 3 iOS roles
+
+    Resource:
+      type: object
+      required:
+        - title
+        - url
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 120
+          example: LeetCode Top Interview 150
+        url:
+          type: string
+          format: uri
+          example: https://leetcode.com/studyplan/top-interview-150/
+
+    Prep:
+      type: object
+      required:
+        - prepOutline
+        - weeklyDrillPlan
+        - starterQuestions
+        - resources
+      properties:
+        prepOutline:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrepSection'
+        weeklyDrillPlan:
+          type: array
+          items:
+            $ref: '#/components/schemas/DrillDay'
+        starterQuestions:
+          type: array
+          minItems: 3
+          maxItems: 10
+          items:
+            type: string
+            minLength: 1
+            maxLength: 200
+          example:
+            - Implement a function to reverse a string
+            - Design a UITableView with custom cells
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Resource'
+
+    PrepSection:
+      type: object
+      required:
+        - section
+        - items
+      properties:
+        section:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: Data Structures & Algorithms
+        items:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 160
+          example:
+            - Master arrays, strings, hash maps
+            - Practice tree and graph traversals
+
+    DrillDay:
+      type: object
+      required:
+        - day
+        - drills
+      properties:
+        day:
+          type: string
+          enum:
+            - Mon
+            - Tue
+            - Wed
+            - Thu
+            - Fri
+          example: Mon
+        drills:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 160
+          example:
+            - Solve 2 easy LC problems
+            - Review Swift basics
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: Validation failed
+        details:
+          type: array
+          items:
+            type: object
+        traceId:
+          type: string
+          format: uuid
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+
+  responses:
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Profile validation failed
+            details:
+              - instancePath: /timeBudgetHoursPerDay
+                message: must be >= 0.5
+            traceId: f47ac10b-58cc-4372-a567-0e02b2c3d479
+
+    RateLimitError:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+          example:
+            error: Too many requests, please try again later.
+
+    UpstreamError:
+      description: Upstream service error (OpenAI)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: OpenAI API request failed
+            traceId: f47ac10b-58cc-4372-a567-0e02b2c3d479
+
+  securitySchemes: {}
+

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WeekView: View {
     @EnvironmentObject var appState: AppState
-    @State private var selectedDay: Weekday = getCurrentWeekday()
+    @State private var selectedDay: Weekday = WeekView.getCurrentWeekday()
     
     var body: some View {
         ScrollView {
@@ -21,7 +21,7 @@ struct WeekView: View {
                             DayButton(
                                 day: day,
                                 isSelected: selectedDay == day,
-                                isToday: day == getCurrentWeekday()
+                                isToday: day == WeekView.getCurrentWeekday()
                             ) {
                                 selectedDay = day
                             }
