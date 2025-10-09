@@ -7,42 +7,461 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		InterviewPrepAppApp.swift in Sources = {isa = PBXBuildFile; };
-		ContentView.swift in Sources = {isa = PBXBuildFile; };
-		Assets.xcassets in Resources = {isa = PBXBuildFile; };
+		A1000000000000000000001 /* InterviewPrepAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001 /* InterviewPrepAppApp.swift */; };
+		A1000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000002 /* ContentView.swift */; };
+		A1000000000000000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000003 /* Assets.xcassets */; };
+		A1000000000000000000004 /* DailyTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000004 /* DailyTask.swift */; };
+		A1000000000000000000005 /* PrepPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000005 /* PrepPack.swift */; };
+		A1000000000000000000006 /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000006 /* Routine.swift */; };
+		A1000000000000000000007 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000007 /* UserProfile.swift */; };
+		A1000000000000000000008 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000008 /* AppState.swift */; };
+		A1000000000000000000009 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000009 /* NetworkService.swift */; };
+		A100000000000000000000A /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000000000000000000A /* StorageService.swift */; };
+		A100000000000000000000B /* ColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000000000000000000B /* ColorExtensions.swift */; };
+		A100000000000000000000C /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000000000000000000C /* DateExtensions.swift */; };
+		A100000000000000000000D /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000000000000000000D /* HomeView.swift */; };
+		A100000000000000000000E /* PrepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000000000000000000E /* PrepView.swift */; };
+		A100000000000000000000F /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000000000000000000F /* TodayView.swift */; };
+		A1000000000000000000010 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000010 /* WeekView.swift */; };
+		A1000000000000000000011 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000011 /* OnboardingView.swift */; };
+		A1000000000000000000012 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000012 /* OnboardingViewModel.swift */; };
+		A1000000000000000000013 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000013 /* EditProfileView.swift */; };
+		A1000000000000000000014 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000014 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		InterviewPrepApp.app = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InterviewPrepApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1000000000000000000001 /* InterviewPrepAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewPrepAppApp.swift; sourceTree = "<group>"; };
+		B1000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B1000000000000000000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B1000000000000000000004 /* DailyTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyTask.swift; sourceTree = "<group>"; };
+		B1000000000000000000005 /* PrepPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrepPack.swift; sourceTree = "<group>"; };
+		B1000000000000000000006 /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
+		B1000000000000000000007 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		B1000000000000000000008 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		B1000000000000000000009 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		B100000000000000000000A /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
+		B100000000000000000000B /* ColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensions.swift; sourceTree = "<group>"; };
+		B100000000000000000000C /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
+		B100000000000000000000D /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		B100000000000000000000E /* PrepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrepView.swift; sourceTree = "<group>"; };
+		B100000000000000000000F /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		B1000000000000000000010 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
+		B1000000000000000000011 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		B1000000000000000000012 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
+		B1000000000000000000013 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
+		B1000000000000000000014 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B1000000000000000000015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C1000000000000000000001 /* InterviewPrepApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InterviewPrepApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		D1000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
-		MainGroup = {
+		E1000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				InterviewPrepApp,
-				Products,
+				E1000000000000000000002 /* InterviewPrepApp */,
+				E1000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		Products = {
+		E1000000000000000000002 /* InterviewPrepApp */ = {
 			isa = PBXGroup;
 			children = (
-				InterviewPrepApp.app,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		InterviewPrepApp = {
-			isa = PBXGroup;
-			children = (
+				B1000000000000000000001 /* InterviewPrepAppApp.swift */,
+				B1000000000000000000002 /* ContentView.swift */,
+				E1000000000000000000004 /* Models */,
+				E1000000000000000000005 /* Services */,
+				E1000000000000000000006 /* Utils */,
+				E1000000000000000000007 /* Views */,
+				B1000000000000000000003 /* Assets.xcassets */,
+				B1000000000000000000015 /* Info.plist */,
 			);
 			path = InterviewPrepApp;
 			sourceTree = "<group>";
 		};
+		E1000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C1000000000000000000001 /* InterviewPrepApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E1000000000000000000004 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B1000000000000000000004 /* DailyTask.swift */,
+				B1000000000000000000005 /* PrepPack.swift */,
+				B1000000000000000000006 /* Routine.swift */,
+				B1000000000000000000007 /* UserProfile.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		E1000000000000000000005 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				B1000000000000000000008 /* AppState.swift */,
+				B1000000000000000000009 /* NetworkService.swift */,
+				B100000000000000000000A /* StorageService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		E1000000000000000000006 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				B100000000000000000000B /* ColorExtensions.swift */,
+				B100000000000000000000C /* DateExtensions.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		E1000000000000000000007 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E1000000000000000000008 /* Home */,
+				E1000000000000000000009 /* Onboarding */,
+				E100000000000000000000A /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E1000000000000000000008 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				B100000000000000000000D /* HomeView.swift */,
+				B100000000000000000000E /* PrepView.swift */,
+				B100000000000000000000F /* TodayView.swift */,
+				B1000000000000000000010 /* WeekView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		E1000000000000000000009 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				B1000000000000000000011 /* OnboardingView.swift */,
+				B1000000000000000000012 /* OnboardingViewModel.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		E100000000000000000000A /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				B1000000000000000000013 /* EditProfileView.swift */,
+				B1000000000000000000014 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
-	};
-	rootObject = MainGroup;
-}
+/* Begin PBXNativeTarget section */
+		F1000000000000000000001 /* InterviewPrepApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1000000000000000000002 /* Build configuration list for PBXNativeTarget "InterviewPrepApp" */;
+			buildPhases = (
+				G1000000000000000000001 /* Sources */,
+				D1000000000000000000001 /* Frameworks */,
+				G1000000000000000000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InterviewPrepApp;
+			productName = InterviewPrepApp;
+			productReference = C1000000000000000000001 /* InterviewPrepApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
 
+/* Begin PBXProject section */
+		H1000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					F1000000000000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = H1000000000000000000002 /* Build configuration list for PBXProject "InterviewPrepApp" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E1000000000000000000001;
+			productRefGroup = E1000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F1000000000000000000001 /* InterviewPrepApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		G1000000000000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000000000000000000003 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		G1000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000000000000000000001 /* InterviewPrepAppApp.swift in Sources */,
+				A1000000000000000000002 /* ContentView.swift in Sources */,
+				A1000000000000000000004 /* DailyTask.swift in Sources */,
+				A1000000000000000000005 /* PrepPack.swift in Sources */,
+				A1000000000000000000006 /* Routine.swift in Sources */,
+				A1000000000000000000007 /* UserProfile.swift in Sources */,
+				A1000000000000000000008 /* AppState.swift in Sources */,
+				A1000000000000000000009 /* NetworkService.swift in Sources */,
+				A100000000000000000000A /* StorageService.swift in Sources */,
+				A100000000000000000000B /* ColorExtensions.swift in Sources */,
+				A100000000000000000000C /* DateExtensions.swift in Sources */,
+				A100000000000000000000D /* HomeView.swift in Sources */,
+				A100000000000000000000E /* PrepView.swift in Sources */,
+				A100000000000000000000F /* TodayView.swift in Sources */,
+				A1000000000000000000010 /* WeekView.swift in Sources */,
+				A1000000000000000000011 /* OnboardingView.swift in Sources */,
+				A1000000000000000000012 /* OnboardingViewModel.swift in Sources */,
+				A1000000000000000000013 /* EditProfileView.swift in Sources */,
+				A1000000000000000000014 /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		I1000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = WKZVKBWK98;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		I1000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = WKZVKBWK98;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		I1000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = InterviewPrepApp/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.interviewprep.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		I1000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = InterviewPrepApp/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.interviewprep.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F1000000000000000000002 /* Build configuration list for PBXNativeTarget "InterviewPrepApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				I1000000000000000000003 /* Debug */,
+				I1000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		H1000000000000000000002 /* Build configuration list for PBXProject "InterviewPrepApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				I1000000000000000000001 /* Debug */,
+				I1000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = H1000000000000000000001 /* Project object */;
+}

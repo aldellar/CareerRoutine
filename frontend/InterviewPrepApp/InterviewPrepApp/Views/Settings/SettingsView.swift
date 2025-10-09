@@ -45,7 +45,7 @@ struct SettingsView: View {
                         
                         VStack(spacing: 8) {
                             ProfileDetailRow(label: "Stage", value: profile.currentStage.rawValue)
-                            ProfileDetailRow(label: "Time Budget", value: "\(profile.timeBudgetHoursPerDay, specifier: "%.1f") hrs/day")
+                            ProfileDetailRow(label: "Time Budget", value: String(format: "%.1f hrs/day", profile.timeBudgetHoursPerDay))
                             ProfileDetailRow(label: "Available Days", value: "\(profile.availableDays.count) days/week")
                         }
                     }
