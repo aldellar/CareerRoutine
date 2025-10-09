@@ -1,0 +1,48 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		InterviewPrepAppApp.swift in Sources = {isa = PBXBuildFile; };
+		ContentView.swift in Sources = {isa = PBXBuildFile; };
+		Assets.xcassets in Resources = {isa = PBXBuildFile; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		InterviewPrepApp.app = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InterviewPrepApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		MainGroup = {
+			isa = PBXGroup;
+			children = (
+				InterviewPrepApp,
+				Products,
+			);
+			sourceTree = "<group>";
+		};
+		Products = {
+			isa = PBXGroup;
+			children = (
+				InterviewPrepApp.app,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		InterviewPrepApp = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = InterviewPrepApp;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+	};
+	rootObject = MainGroup;
+}
+

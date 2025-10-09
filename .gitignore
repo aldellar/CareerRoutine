@@ -1,0 +1,69 @@
+# =========================
+# macOS (top-level)
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =========================
+# Backend (Node.js) — aiosapp/backend
+# =========================
+backend/node_modules/
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+backend/pnpm-lock.yaml
+# Keep package-lock for reproducible builds (do NOT ignore)
+# backend/package-lock.json
+
+# Env files (never commit secrets)
+backend/.env
+backend/.env.*.local
+
+# Build artifacts / caches (if you add any)
+backend/dist/
+backend/build/
+backend/.cache/
+
+# Docker
+backend/.dockerignore
+
+# =========================
+# Frontend (Xcode/Swift) — aiosapp/frontend
+# =========================
+# Build outputs
+frontend/**/build/
+frontend/**/Build/
+# Xcode derived data usually lives outside the repo, but ignore if present
+frontend/DerivedData/
+
+# User-specific Xcode settings
+frontend/**/*.xcuserstate
+frontend/**/*.xcuserdatad/
+frontend/**/*.xcuserdata/
+
+# Xcode project/workspace metadata
+frontend/**/*.xccheckout
+frontend/**/*.xcscmblueprint
+frontend/**/*.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+
+# Swift Package Manager
+# Best practice: COMMIT Package.resolved for reproducible builds, so do NOT ignore it.
+# frontend/Package.resolved
+
+# CocoaPods (only if you add it later)
+# frontend/Pods/
+# frontend/Podfile.lock
+
+# Fastlane (only if you add it later)
+# frontend/fastlane/report.xml
+# frontend/fastlane/Preview.html
+# frontend/fastlane/screenshots/**/*.png
+# frontend/fastlane/test_output
+
+# =========================
+# Tooling & Misc (repo-wide)
+# =========================
+.idea/
+.vscode/
+*.log
