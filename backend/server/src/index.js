@@ -9,6 +9,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import { rateLimit } from 'express-rate-limit';
 import { v4 as uuidv4 } from 'uuid';
+import { networkInterfaces } from 'os';
 import config from './config.js';
 import logger from './utils/logger.js';
 import generateRoutes from './routes/generate.js';
@@ -130,6 +131,33 @@ const server = app.listen(config.port, () => {
     nodeEnv: config.nodeEnv,
     model: config.openaiModel,
   }, 'Server started successfully');
+  
+  // Show local network addresses for iOS testing
+  console.log('\n📱 iOS App Configuration:');
+  console.log('─────────────────────────────────────');
+  console.log('Simulator:      http://localhost:' + config.port);
+  
+  // Get local IP addresses
+  const interfaces = networkInterfaces();
+  const addresses = [];
+  Object.keys(interfaces).forEach((ifname) => {
+    interfaces[ifname].forEach((iface) => {
+      // Skip internal and non-IPv4 addresses
+      if (iface.family === 'IPv4' && !iface.internal) {
+        addresses.push(iface.address);
+      }
+    });
+  });
+  
+  if (addresses.length > 0) {
+    console.log('Physical Device:');
+    addresses.forEach((addr) => {
+      console.log('                http://' + addr + ':' + config.port);
+    });
+  } else {
+    console.log('Physical Device: No local network detected');
+  }
+  console.log('─────────────────────────────────────\n');
 });
 
 // Graceful shutdown

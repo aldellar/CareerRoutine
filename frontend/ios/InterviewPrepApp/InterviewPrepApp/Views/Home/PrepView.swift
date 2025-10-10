@@ -231,7 +231,7 @@ struct PrepView: View {
     
     private func generatePrepPack() {
         guard let profile = appState.userProfile else { return }
-        viewModel.generatePrep(profile: profile)
+        viewModel.generatePrep(profile: profile, appState: appState)
     }
     
     private func regenerateResources() {

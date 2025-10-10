@@ -17,76 +17,130 @@ struct OnboardingView: View {
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea()
                 
-                VStack(spacing: 0) {
-                    // Progress indicator
-                    ProgressView(value: Double(viewModel.currentStep), total: 5)
-                        .padding()
-                    
-                    // Content
-                    TabView(selection: $viewModel.currentStep) {
-                        WelcomeStepView()
-                            .tag(0)
+                if viewModel.isGeneratingPlan {
+                    // Loading view while generating plan
+                    VStack(spacing: 24) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .padding()
                         
-                        NameStepView(name: $viewModel.name)
-                            .tag(1)
+                        Text("Setting up your interview prep plan...")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .multilineTextAlignment(.center)
                         
-                        StageAndRoleStepView(
-                            stage: $viewModel.stage,
-                            targetRole: $viewModel.targetRole
-                        )
-                        .tag(2)
+                        Text("This may take a moment as we generate your personalized weekly routine and prep materials.")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 32)
                         
-                        TimeBudgetStepView(
-                            hoursPerDay: $viewModel.hoursPerDay,
-                            availableDays: $viewModel.availableDays
-                        )
-                        .tag(3)
-                        
-                        PreferencesStepView(
-                            preferredTools: $viewModel.preferredTools
-                        )
-                        .tag(4)
+                        if let error = viewModel.generationError {
+                            VStack(spacing: 12) {
+                                Text("Error")
+                                    .font(.headline)
+                                    .foregroundColor(.red)
+                                
+                                Text(error)
+                                    .font(.body)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                                
+                                Button(action: {
+                                    viewModel.completeOnboarding(appState: appState)
+                                }) {
+                                    Text("Try Again")
+                                        .fontWeight(.semibold)
+                                        .padding()
+                                        .background(Color.blue)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(12)
+                                }
+                                
+                                Button(action: {
+                                    // Skip generation and go to home
+                                    viewModel.isGeneratingPlan = false
+                                }) {
+                                    Text("Skip for Now")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                            .padding(.top, 24)
+                            .padding(.horizontal, 32)
+                        }
                     }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .animation(.easeInOut, value: viewModel.currentStep)
-                    
-                    // Navigation buttons
-                    HStack(spacing: 16) {
-                        if viewModel.currentStep > 0 {
+                } else {
+                    VStack(spacing: 0) {
+                        // Progress indicator
+                        ProgressView(value: Double(viewModel.currentStep), total: 5)
+                            .padding()
+                        
+                        // Content
+                        TabView(selection: $viewModel.currentStep) {
+                            WelcomeStepView()
+                                .tag(0)
+                            
+                            NameStepView(name: $viewModel.name)
+                                .tag(1)
+                            
+                            StageAndRoleStepView(
+                                stage: $viewModel.stage,
+                                targetRole: $viewModel.targetRole
+                            )
+                            .tag(2)
+                            
+                            TimeBudgetStepView(
+                                hoursPerDay: $viewModel.hoursPerDay,
+                                availableDays: $viewModel.availableDays
+                            )
+                            .tag(3)
+                            
+                            PreferencesStepView(
+                                preferredTools: $viewModel.preferredTools
+                            )
+                            .tag(4)
+                        }
+                        .tabViewStyle(.page(indexDisplayMode: .never))
+                        .animation(.easeInOut, value: viewModel.currentStep)
+                        
+                        // Navigation buttons
+                        HStack(spacing: 16) {
+                            if viewModel.currentStep > 0 {
+                                Button(action: {
+                                    withAnimation {
+                                        viewModel.previousStep()
+                                    }
+                                }) {
+                                    Text("Back")
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .background(Color(.systemGray5))
+                                        .foregroundColor(.primary)
+                                        .cornerRadius(12)
+                                }
+                            }
+                            
                             Button(action: {
-                                withAnimation {
-                                    viewModel.previousStep()
+                                if viewModel.currentStep < 4 {
+                                    withAnimation {
+                                        viewModel.nextStep()
+                                    }
+                                } else {
+                                    viewModel.completeOnboarding(appState: appState)
                                 }
                             }) {
-                                Text("Back")
+                                Text(viewModel.currentStep < 4 ? "Next" : "Get Started")
+                                    .fontWeight(.semibold)
                                     .frame(maxWidth: .infinity)
                                     .padding()
-                                    .background(Color(.systemGray5))
-                                    .foregroundColor(.primary)
+                                    .background(viewModel.canProceed ? Color.blue : Color.gray)
+                                    .foregroundColor(.white)
                                     .cornerRadius(12)
                             }
+                            .disabled(!viewModel.canProceed)
                         }
-                        
-                        Button(action: {
-                            if viewModel.currentStep < 4 {
-                                withAnimation {
-                                    viewModel.nextStep()
-                                }
-                            } else {
-                                viewModel.completeOnboarding(appState: appState)
-                            }
-                        }) {
-                            Text(viewModel.currentStep < 4 ? "Next" : "Get Started")
-                                .fontWeight(.semibold)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(viewModel.canProceed ? Color.blue : Color.gray)
-                                .foregroundColor(.white)
-                                .cornerRadius(12)
-                        }
-                        .disabled(!viewModel.canProceed)
+                        .padding()
                     }
-                    .padding()
                 }
             }
             .navigationBarHidden(true)

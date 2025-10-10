@@ -36,7 +36,7 @@ class WeekViewModel: ObservableObject {
     }
     
     /// Generate a new weekly plan from profile
-    func generatePlan(profile: UserProfile) {
+    func generatePlan(profile: UserProfile, appState: AppState? = nil) {
         // Cancel any existing task
         currentTask?.cancel()
         
@@ -61,6 +61,9 @@ class WeekViewModel: ObservableObject {
                 // Save locally
                 storage.saveRoutine(routine)
                 
+                // Update AppState if provided
+                appState?.saveRoutine(routine)
+                
                 // Update state
                 planState = .loaded(routine)
                 showSaveConfirmation = true
@@ -73,7 +76,7 @@ class WeekViewModel: ObservableObject {
                 guard !Task.isCancelled else { return }
                 planState = .failed(error)
                 alertState = AlertState.error(error) { [weak self] in
-                    self?.generatePlan(profile: profile)
+                    self?.generatePlan(profile: profile, appState: appState)
                 }
             } catch {
                 guard !Task.isCancelled else { return }

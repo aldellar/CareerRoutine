@@ -13,6 +13,7 @@ struct WeekView: View {
     @StateObject private var rerollViewModel = RerollViewModel()
     @StateObject private var reachability = Reachability()
     @State private var selectedDay: Weekday = WeekView.getCurrentWeekday()
+    @State private var hasAttemptedAutoGeneration = false
     
     var body: some View {
         ScrollView {
@@ -193,12 +194,13 @@ struct WeekView: View {
         }
         .onAppear {
             syncPlanState()
+            autoGeneratePlanIfNeeded()
         }
     }
     
     private func generatePlan() {
         guard let profile = appState.userProfile else { return }
-        viewModel.generatePlan(profile: profile)
+        viewModel.generatePlan(profile: profile, appState: appState)
     }
     
     private func syncPlanState() {
@@ -207,6 +209,23 @@ struct WeekView: View {
            !viewModel.planState.hasValue {
             appState.currentRoutine = routine
         }
+    }
+    
+    private func autoGeneratePlanIfNeeded() {
+        // Auto-generate plan if:
+        // 1. We have a profile
+        // 2. We don't have a routine yet
+        // 3. We haven't already attempted auto-generation
+        // 4. We're online
+        guard !hasAttemptedAutoGeneration,
+              let profile = appState.userProfile,
+              appState.currentRoutine == nil,
+              reachability.isOnline else {
+            return
+        }
+        
+        hasAttemptedAutoGeneration = true
+        viewModel.generatePlan(profile: profile, appState: appState)
     }
     
     private static func getCurrentWeekday() -> Weekday {

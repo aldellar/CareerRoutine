@@ -170,6 +170,19 @@ struct SettingsView: View {
             // Developer Tools Section (DEBUG only)
             #if DEBUG
             Section {
+                // Setup Instructions
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Network Setup")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.blue)
+                    
+                    Text(APIConfig.getSetupInstructions())
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 4)
+                
                 // API Base URL Override
                 VStack(alignment: .leading, spacing: 8) {
                     Text("API Base URL Override")
@@ -183,6 +196,7 @@ struct SettingsView: View {
                     .textFieldStyle(.roundedBorder)
                     .autocapitalization(.none)
                     .autocorrectionDisabled()
+                    .keyboardType(.URL)
                     .onChange(of: apiBaseOverride) { newValue in
                         UserDefaults.standard.set(
                             newValue,
@@ -366,7 +380,7 @@ struct SettingsView: View {
                 timeBudgetHoursPerDay: 2.0,
                 availableDays: [.monday, .tuesday, .wednesday, .thursday, .friday]
             )
-            appState.saveUserProfile(sampleProfile)
+            appState.saveProfile(sampleProfile)
             weekViewModel.generatePlan(profile: sampleProfile)
             return
         }
@@ -382,7 +396,7 @@ struct SettingsView: View {
                 timeBudgetHoursPerDay: 2.0,
                 availableDays: [.monday, .tuesday, .wednesday, .thursday, .friday]
             )
-            appState.saveUserProfile(sampleProfile)
+            appState.saveProfile(sampleProfile)
             prepViewModel.generatePrep(profile: sampleProfile)
             return
         }

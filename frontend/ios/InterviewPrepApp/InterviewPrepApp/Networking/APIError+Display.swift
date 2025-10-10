@@ -59,7 +59,9 @@ extension APIError {
     /// Should show retry option
     var isRetryable: Bool {
         switch self {
-        case .timeout, .networkUnavailable, .server(let status, _):
+        case .timeout, .networkUnavailable:
+            return true
+        case .server(let status, _):
             return status >= 500
         default:
             return false

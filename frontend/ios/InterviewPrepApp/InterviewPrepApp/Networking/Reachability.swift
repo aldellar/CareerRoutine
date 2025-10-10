@@ -22,7 +22,7 @@ class Reachability: ObservableObject {
     }
     
     deinit {
-        stopMonitoring()
+        monitor.cancel()
     }
     
     private func startMonitoring() {
@@ -32,10 +32,6 @@ class Reachability: ObservableObject {
             }
         }
         monitor.start(queue: queue)
-    }
-    
-    private func stopMonitoring() {
-        monitor.cancel()
     }
 }
 

@@ -49,7 +49,7 @@ actor APIClient {
     
     /// Generate routine plan
     func generateRoutine(profile: APIProfile) async throws -> APIPlan {
-        let body = ["profile": profile]
+        let body = ["profile": try encodableToDict(profile)]
         let response: RoutineResponse = try await request(
             path: "/generate/routine",
             method: "POST",
@@ -61,7 +61,7 @@ actor APIClient {
     
     /// Generate prep pack
     func generatePrep(profile: APIProfile) async throws -> APIPrep {
-        let body = ["profile": profile]
+        let body = ["profile": try encodableToDict(profile)]
         let response: PrepResponse = try await request(
             path: "/generate/prep",
             method: "POST",

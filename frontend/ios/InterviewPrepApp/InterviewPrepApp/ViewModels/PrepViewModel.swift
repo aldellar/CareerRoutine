@@ -36,7 +36,7 @@ class PrepViewModel: ObservableObject {
     }
     
     /// Generate a new prep pack from profile
-    func generatePrep(profile: UserProfile) {
+    func generatePrep(profile: UserProfile, appState: AppState? = nil) {
         // Cancel any existing task
         currentTask?.cancel()
         
@@ -61,6 +61,9 @@ class PrepViewModel: ObservableObject {
                 // Save locally
                 storage.savePrepPack(prepPack)
                 
+                // Update AppState if provided
+                appState?.savePrepPack(prepPack)
+                
                 // Update state
                 prepState = .loaded(prepPack)
                 showSaveConfirmation = true
@@ -73,7 +76,7 @@ class PrepViewModel: ObservableObject {
                 guard !Task.isCancelled else { return }
                 prepState = .failed(error)
                 alertState = AlertState.error(error) { [weak self] in
-                    self?.generatePrep(profile: profile)
+                    self?.generatePrep(profile: profile, appState: appState)
                 }
             } catch {
                 guard !Task.isCancelled else { return }

@@ -65,6 +65,7 @@ frontend/
 | Task | Command |
 |------|---------|
 | Open iOS Project | `cd ios/InterviewPrepApp && open InterviewPrepApp.xcodeproj` |
+| Reset Xcode | `./reset-xcode.sh` |
 | Read Docs | `open docs/` |
 | View Architecture | `open docs/architecture.md` |
 | Quick Start | `open docs/quick-start.md` |
