@@ -4,7 +4,7 @@
 
 ### 1. Open the Project
 ```bash
-cd /Users/dellaringo/Documents/GitHub/AiOSapp/frontend/InterviewPrepApp
+cd /Users/dellaringo/Documents/GitHub/AiOSapp/frontend/ios/InterviewPrepApp
 open InterviewPrepApp.xcodeproj
 ```
 

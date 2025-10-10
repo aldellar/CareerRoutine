@@ -10,8 +10,14 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
+    @StateObject private var weekViewModel = WeekViewModel()
+    @StateObject private var prepViewModel = PrepViewModel()
     @State private var showingEditProfile: Bool = false
     @State private var showingResetAlert: Bool = false
+    @State private var apiBaseOverride: String = 
+        UserDefaults.standard.string(forKey: "api_base") ?? ""
+    @State private var healthCheckResult: String?
+    @State private var showingHealthCheck = false
     
     var body: some View {
         List {
@@ -161,6 +167,94 @@ struct SettingsView: View {
                     .font(.caption)
             }
             
+            // Developer Tools Section (DEBUG only)
+            #if DEBUG
+            Section {
+                // API Base URL Override
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("API Base URL Override")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    TextField(
+                        "http://localhost:8081",
+                        text: $apiBaseOverride
+                    )
+                    .textFieldStyle(.roundedBorder)
+                    .autocapitalization(.none)
+                    .autocorrectionDisabled()
+                    .onChange(of: apiBaseOverride) { newValue in
+                        UserDefaults.standard.set(
+                            newValue,
+                            forKey: "api_base"
+                        )
+                    }
+                    
+                    Text("Leave empty to use default. Restart app after changing.")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 4)
+                
+                // Health Check
+                Button(action: checkHealth) {
+                    HStack {
+                        Image(systemName: "heart.text.square")
+                        Text("Ping Health Endpoint")
+                        Spacer()
+                        if showingHealthCheck {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                        }
+                    }
+                }
+                .disabled(showingHealthCheck)
+                
+                if let result = healthCheckResult {
+                    Text(result)
+                        .font(.caption)
+                        .foregroundColor(
+                            result.contains("OK") ? .green : .red
+                        )
+                }
+                
+                // Generate with Sample Profile
+                Button(action: generateSamplePlan) {
+                    HStack {
+                        Image(systemName: "calendar.badge.plus")
+                        Text("Generate Plan (Sample Profile)")
+                    }
+                }
+                
+                Button(action: generateSamplePrep) {
+                    HStack {
+                        Image(systemName: "book.badge.plus")
+                        Text("Generate Prep (Sample Profile)")
+                    }
+                }
+                
+                // Load Stub Data
+                Button(action: loadStubPlan) {
+                    HStack {
+                        Image(systemName: "doc.badge.plus")
+                        Text("Load Stub Plan Locally")
+                    }
+                }
+                
+                Button(action: loadStubPrep) {
+                    HStack {
+                        Image(systemName: "doc.badge.plus")
+                        Text("Load Stub Prep Locally")
+                    }
+                }
+            } header: {
+                Text("Developer Tools")
+            } footer: {
+                Text("These tools are only available in DEBUG builds.")
+                    .font(.caption)
+            }
+            #endif
+            
             // App Info Section
             Section {
                 HStack {
@@ -168,6 +262,16 @@ struct SettingsView: View {
                     Spacer()
                     Text("1.0.0")
                         .foregroundColor(.secondary)
+                }
+                
+                HStack {
+                    Text("API Base URL")
+                    Spacer()
+                    Text(APIConfig.baseURL.absoluteString)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
                 }
             } header: {
                 Text("About")
@@ -231,6 +335,76 @@ struct SettingsView: View {
     private func regeneratePrepPack() {
         generatePrepPack()
     }
+    
+    // MARK: - Developer Tools
+    
+    #if DEBUG
+    private func checkHealth() {
+        showingHealthCheck = true
+        healthCheckResult = nil
+        
+        Task {
+            let apiClient = APIClient()
+            let isHealthy = await apiClient.health()
+            
+            await MainActor.run {
+                showingHealthCheck = false
+                healthCheckResult = isHealthy 
+                    ? "✓ Server is healthy (200 OK)" 
+                    : "✗ Server unavailable"
+            }
+        }
+    }
+    
+    private func generateSamplePlan() {
+        guard let profile = appState.userProfile else {
+            // Create sample profile if none exists
+            let sampleProfile = UserProfile(
+                name: "Sample User",
+                currentStage: .secondYear,
+                targetRole: "iOS Engineer",
+                timeBudgetHoursPerDay: 2.0,
+                availableDays: [.monday, .tuesday, .wednesday, .thursday, .friday]
+            )
+            appState.saveUserProfile(sampleProfile)
+            weekViewModel.generatePlan(profile: sampleProfile)
+            return
+        }
+        weekViewModel.generatePlan(profile: profile)
+    }
+    
+    private func generateSamplePrep() {
+        guard let profile = appState.userProfile else {
+            let sampleProfile = UserProfile(
+                name: "Sample User",
+                currentStage: .secondYear,
+                targetRole: "iOS Engineer",
+                timeBudgetHoursPerDay: 2.0,
+                availableDays: [.monday, .tuesday, .wednesday, .thursday, .friday]
+            )
+            appState.saveUserProfile(sampleProfile)
+            prepViewModel.generatePrep(profile: sampleProfile)
+            return
+        }
+        prepViewModel.generatePrep(profile: profile)
+    }
+    
+    private func loadStubPlan() {
+        weekViewModel.loadStubPlan()
+        // Reload from storage to update UI
+        if let routine = StorageService().loadRoutine() {
+            appState.currentRoutine = routine
+        }
+    }
+    
+    private func loadStubPrep() {
+        prepViewModel.loadStubPrep()
+        // Reload from storage to update UI
+        if let prepPack = StorageService().loadPrepPack() {
+            appState.prepPack = prepPack
+        }
+    }
+    #endif
 }
 
 struct ProfileDetailRow: View {

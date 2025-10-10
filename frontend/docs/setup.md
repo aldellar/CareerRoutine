@@ -12,9 +12,9 @@
 
 Since this is a pure SwiftUI project without external dependencies, you can open it directly:
 
-1. Navigate to the frontend directory:
+1. Navigate to the iOS project directory:
    ```bash
-   cd /Users/dellaringo/Documents/GitHub/AiOSapp/frontend/InterviewPrepApp
+   cd /Users/dellaringo/Documents/GitHub/AiOSapp/frontend/ios/InterviewPrepApp
    ```
 
 2. Open the project in Xcode:

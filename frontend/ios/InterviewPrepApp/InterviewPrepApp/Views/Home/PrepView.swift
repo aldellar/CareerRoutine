@@ -9,11 +9,41 @@ import SwiftUI
 
 struct PrepView: View {
     @EnvironmentObject var appState: AppState
+    @StateObject private var viewModel = PrepViewModel()
+    @StateObject private var reachability = Reachability()
     @State private var showingRegenerateOptions: Bool = false
     
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                // Offline indicator
+                if !reachability.isOnline {
+                    HStack {
+                        Image(systemName: "wifi.slash")
+                        Text("Offline")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.red)
+                    .cornerRadius(8)
+                }
+                
+                // Save confirmation banner
+                if viewModel.showSaveConfirmation {
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill")
+                        Text("Prep pack saved successfully")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.green)
+                    .cornerRadius(8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
                 if let prepPack = appState.prepPack {
                     // Practice Cadence
                     VStack(alignment: .leading, spacing: 12) {
@@ -117,24 +147,37 @@ struct PrepView: View {
                         .padding(.horizontal)
                     }
                 } else {
+                    // Loading, error, or no prep pack states
                     VStack(spacing: 16) {
-                        Image(systemName: "book.closed")
-                            .font(.system(size: 48))
-                            .foregroundColor(.secondary)
-                        
-                        Text("No prep pack generated yet")
-                            .font(.headline)
-                            .foregroundColor(.secondary)
-                        
-                        Button(action: {
-                            generatePrepPack()
-                        }) {
-                            Text("Generate Prep Pack")
-                                .fontWeight(.semibold)
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(12)
+                        if viewModel.prepState.isLoading {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                            Text("Generating your prep pack...")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 8)
+                        } else {
+                            Image(systemName: "book.closed")
+                                .font(.system(size: 48))
+                                .foregroundColor(.secondary)
+                            
+                            Text("No prep pack generated yet")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                            
+                            Button(action: generatePrepPack) {
+                                Text("Generate Prep Pack")
+                                    .fontWeight(.semibold)
+                                    .padding()
+                                    .background(
+                                        reachability.isOnline 
+                                            ? Color.blue 
+                                            : Color.gray
+                                    )
+                                    .foregroundColor(.white)
+                                    .cornerRadius(12)
+                            }
+                            .disabled(!reachability.isOnline)
                         }
                     }
                     .padding(.top, 60)
@@ -156,57 +199,56 @@ struct PrepView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
+        .alert(item: $viewModel.alertState) { alertState in
+            if let secondary = alertState.secondaryButton {
+                return Alert(
+                    title: Text(alertState.title),
+                    message: Text(alertState.message),
+                    primaryButton: .default(
+                        Text(alertState.primaryButton?.title ?? "OK"),
+                        action: alertState.primaryButton?.action
+                    ),
+                    secondaryButton: .cancel(
+                        Text(secondary.title),
+                        action: secondary.action
+                    )
+                )
+            } else {
+                return Alert(
+                    title: Text(alertState.title),
+                    message: Text(alertState.message),
+                    dismissButton: .default(
+                        Text(alertState.primaryButton?.title ?? "OK"),
+                        action: alertState.primaryButton?.action
+                    )
+                )
+            }
+        }
+        .onAppear {
+            syncPrepState()
+        }
     }
     
     private func generatePrepPack() {
         guard let profile = appState.userProfile else { return }
-        
-        let networkService = NetworkService()
-        Task {
-            do {
-                let prepPack = try await networkService.generatePrepPack(profile: profile)
-                await MainActor.run {
-                    appState.savePrepPack(prepPack)
-                }
-            } catch {
-                print("Error generating prep pack: \(error)")
-            }
-        }
+        viewModel.generatePrep(profile: profile)
     }
     
     private func regenerateResources() {
-        guard let profile = appState.userProfile,
-              var currentPack = appState.prepPack else { return }
-        
-        let networkService = NetworkService()
-        Task {
-            do {
-                let newResources = try await networkService.regenerateResources(profile: profile, currentPack: currentPack)
-                await MainActor.run {
-                    currentPack.resources = newResources
-                    appState.savePrepPack(currentPack)
-                }
-            } catch {
-                print("Error regenerating resources: \(error)")
-            }
-        }
+        // TODO: Implement with RerollViewModel if needed
+        print("Regenerate resources not yet implemented via API")
     }
     
     private func regenerateMockPrompts() {
-        guard let profile = appState.userProfile,
-              var currentPack = appState.prepPack else { return }
-        
-        let networkService = NetworkService()
-        Task {
-            do {
-                let newPrompts = try await networkService.regenerateMockPrompts(profile: profile, currentPack: currentPack)
-                await MainActor.run {
-                    currentPack.mockInterviewPrompts = newPrompts
-                    appState.savePrepPack(currentPack)
-                }
-            } catch {
-                print("Error regenerating prompts: \(error)")
-            }
+        // TODO: Implement with RerollViewModel if needed
+        print("Regenerate prompts not yet implemented via API")
+    }
+    
+    private func syncPrepState() {
+        // Sync ViewModel state with AppState
+        if let prepPack = appState.prepPack,
+           !viewModel.prepState.hasValue {
+            appState.prepPack = prepPack
         }
     }
 }

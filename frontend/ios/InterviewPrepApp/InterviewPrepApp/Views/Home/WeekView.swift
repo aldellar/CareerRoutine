@@ -9,11 +9,42 @@ import SwiftUI
 
 struct WeekView: View {
     @EnvironmentObject var appState: AppState
+    @StateObject private var viewModel = WeekViewModel()
+    @StateObject private var rerollViewModel = RerollViewModel()
+    @StateObject private var reachability = Reachability()
     @State private var selectedDay: Weekday = WeekView.getCurrentWeekday()
     
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                // Offline indicator
+                if !reachability.isOnline {
+                    HStack {
+                        Image(systemName: "wifi.slash")
+                        Text("Offline")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.red)
+                    .cornerRadius(8)
+                }
+                
+                // Save confirmation banner
+                if viewModel.showSaveConfirmation {
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill")
+                        Text("Plan saved successfully")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.green)
+                    .cornerRadius(8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
                 // Day selector
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
@@ -95,24 +126,37 @@ struct WeekView: View {
                         }
                     }
                 } else {
+                    // Loading, error, or no plan states
                     VStack(spacing: 16) {
-                        Image(systemName: "calendar.badge.plus")
-                            .font(.system(size: 48))
-                            .foregroundColor(.secondary)
-                        
-                        Text("No routine generated yet")
-                            .font(.headline)
-                            .foregroundColor(.secondary)
-                        
-                        Button(action: {
-                            // TODO: Trigger routine generation
-                        }) {
-                            Text("Generate Plan")
-                                .fontWeight(.semibold)
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(12)
+                        if viewModel.planState.isLoading {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                            Text("Generating your weekly plan...")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 8)
+                        } else {
+                            Image(systemName: "calendar.badge.plus")
+                                .font(.system(size: 48))
+                                .foregroundColor(.secondary)
+                            
+                            Text("No routine generated yet")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                            
+                            Button(action: generatePlan) {
+                                Text("Generate Plan")
+                                    .fontWeight(.semibold)
+                                    .padding()
+                                    .background(
+                                        reachability.isOnline 
+                                            ? Color.blue 
+                                            : Color.gray
+                                    )
+                                    .foregroundColor(.white)
+                                    .cornerRadius(12)
+                            }
+                            .disabled(!reachability.isOnline)
                         }
                     }
                     .padding(.top, 60)
@@ -122,6 +166,47 @@ struct WeekView: View {
             }
         }
         .background(Color(.systemGroupedBackground))
+        .alert(item: $viewModel.alertState) { alertState in
+            if let secondary = alertState.secondaryButton {
+                return Alert(
+                    title: Text(alertState.title),
+                    message: Text(alertState.message),
+                    primaryButton: .default(
+                        Text(alertState.primaryButton?.title ?? "OK"),
+                        action: alertState.primaryButton?.action
+                    ),
+                    secondaryButton: .cancel(
+                        Text(secondary.title),
+                        action: secondary.action
+                    )
+                )
+            } else {
+                return Alert(
+                    title: Text(alertState.title),
+                    message: Text(alertState.message),
+                    dismissButton: .default(
+                        Text(alertState.primaryButton?.title ?? "OK"),
+                        action: alertState.primaryButton?.action
+                    )
+                )
+            }
+        }
+        .onAppear {
+            syncPlanState()
+        }
+    }
+    
+    private func generatePlan() {
+        guard let profile = appState.userProfile else { return }
+        viewModel.generatePlan(profile: profile)
+    }
+    
+    private func syncPlanState() {
+        // Sync ViewModel state with AppState
+        if let routine = appState.currentRoutine,
+           !viewModel.planState.hasValue {
+            appState.currentRoutine = routine
+        }
     }
     
     private static func getCurrentWeekday() -> Weekday {

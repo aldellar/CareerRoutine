@@ -40,6 +40,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>API_BASE_URL</key>
+	<string>https://your-production-api.com</string>
 </dict>
 </plist>
 
