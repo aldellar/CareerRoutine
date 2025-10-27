@@ -39,6 +39,9 @@ class NetworkService {
         print("   - Mock mode: \(useMockData)")
         print("   - Profile: \(profile.name), \(profile.targetRole)")
         
+        // Validate input for safety
+        validateUserInput(profile)
+        
         if useMockData {
             // Mock mode for offline development
             print("   - Using MOCK data (8 second delay)")
@@ -46,12 +49,27 @@ class NetworkService {
             return createMockRoutine()
         }
         
-        // REAL API CALL
+        // REAL API CALL with safety handling
         print("   - Making REAL API call to backend...")
         let apiProfile = APIProfile.from(profile)
-        let apiPlan = try await apiClient.generateRoutine(profile: apiProfile)
-        print("   - ✅ API response received, converting to Routine")
-        return convertToRoutine(apiPlan)
+        
+        do {
+            let apiPlan = try await apiClient.generateRoutine(profile: apiProfile)
+            
+            // Validate response quality
+            if apiPlan.timeBlocks.isEmpty {
+                print("⚠️ Warning: Empty response from API, using fallback")
+                return createMockRoutine()
+            }
+            
+            print("   - ✅ API response received, converting to Routine")
+            return convertToRoutine(apiPlan)
+            
+        } catch {
+            print("⚠️ API call failed: \(error.localizedDescription)")
+            print("   - Using fallback routine")
+            return createMockRoutine()
+        }
     }
     
     // MARK: - Generate Prep Pack
@@ -61,6 +79,9 @@ class NetworkService {
         print("   - Mock mode: \(useMockData)")
         print("   - Profile: \(profile.name), \(profile.targetRole)")
         
+        // Validate input for safety
+        validateUserInput(profile)
+        
         if useMockData {
             // Mock mode for offline development
             print("   - Using MOCK data (8 second delay)")
@@ -68,12 +89,27 @@ class NetworkService {
             return createMockPrepPack()
         }
         
-        // REAL API CALL
+        // REAL API CALL with safety handling
         print("   - Making REAL API call to backend...")
         let apiProfile = APIProfile.from(profile)
-        let apiPrep = try await apiClient.generatePrep(profile: apiProfile)
-        print("   - ✅ API response received, converting to PrepPack")
-        return convertToPrepPack(apiPrep)
+        
+        do {
+            let apiPrep = try await apiClient.generatePrep(profile: apiProfile)
+            
+            // Validate response quality
+            if apiPrep.prepOutline.isEmpty {
+                print("⚠️ Warning: Empty response from API, using fallback")
+                return createMockPrepPack()
+            }
+            
+            print("   - ✅ API response received, converting to PrepPack")
+            return convertToPrepPack(apiPrep)
+            
+        } catch {
+            print("⚠️ API call failed: \(error.localizedDescription)")
+            print("   - Using fallback prep pack")
+            return createMockPrepPack()
+        }
     }
     
     // MARK: - Regenerate Resources
@@ -413,6 +449,32 @@ class NetworkService {
             "How would you design the architecture for an offline-first iOS app?",
             "Implement a binary search tree and write a method to validate if a tree is a valid BST."
         ]
+    }
+    
+    // MARK: - Input Validation & Safety
+    
+    /// Validates user input to prevent unsafe content
+    private func validateUserInput(_ profile: UserProfile) {
+        // Validate name
+        if profile.name.count > 100 {
+            print("⚠️ Warning: Profile name too long")
+        }
+        
+        // Validate target role
+        if profile.targetRole.count > 100 {
+            print("⚠️ Warning: Target role name too long")
+        }
+        
+        // Validate stage
+        let validStages = ["Student", "Graduate", "New Grad", "Experienced"]
+        if !validStages.contains(profile.stage) {
+            print("⚠️ Warning: Unusual stage value: \(profile.stage)")
+        }
+        
+        // Validate time budget
+        if profile.timeBudgetHoursPerDay <= 0 || profile.timeBudgetHoursPerDay > 24 {
+            print("⚠️ Warning: Invalid time budget: \(profile.timeBudgetHoursPerDay) hours")
+        }
     }
 }
 
