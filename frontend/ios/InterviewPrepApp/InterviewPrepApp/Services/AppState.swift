@@ -10,6 +10,7 @@ import Combine
 
 class AppState: ObservableObject {
     @Published var hasCompletedOnboarding: Bool
+    @Published var isGeneratingInitialContent: Bool = false
     @Published var userProfile: UserProfile?
     @Published var currentRoutine: Routine?
     @Published var prepPack: PrepPack?
@@ -36,6 +37,10 @@ class AppState: ObservableObject {
         updatedProfile.updatedAt = Date()
         self.userProfile = updatedProfile
         storageService.saveUserProfile(updatedProfile)
+        // Don't set onboarding as completed yet - wait for content generation
+    }
+    
+    func completeOnboarding() {
         storageService.setOnboardingCompleted(true)
         self.hasCompletedOnboarding = true
     }

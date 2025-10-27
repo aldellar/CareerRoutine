@@ -35,6 +35,8 @@
 		A1000000000000000000012 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000012 /* OnboardingViewModel.swift */; };
 		A1000000000000000000013 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000013 /* EditProfileView.swift */; };
 		A1000000000000000000014 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000014 /* SettingsView.swift */; };
+		A1000000000000000000016 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000016 /* LoadingView.swift */; };
+		A1000000000000000000017 /* LoadingViewExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000017 /* LoadingViewExample.swift */; };
 		A57FCC7CABC614AD09E4AD8D /* Loadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4105326F5A46AB61FD258C57 /* Loadable.swift */; };
 		BA058448F37E94B13DC29E55 /* APIPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F1C5301517AC2950D4C0DA /* APIPlan.swift */; };
 		C72140660F086833F7F8F699 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C359E64AB2B3B75390C1FA /* APIError.swift */; };
@@ -75,6 +77,8 @@
 		B1000000000000000000013 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
 		B1000000000000000000014 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B1000000000000000000015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B1000000000000000000016 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		B1000000000000000000017 /* LoadingViewExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingViewExample.swift; sourceTree = "<group>"; };
 		B38FCA90446C5B100843353E /* AlertState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertState.swift; sourceTree = "<group>"; };
 		B8AA00B7767AE47F97D1EFCF /* PrepViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrepViewModel.swift; sourceTree = "<group>"; };
 		C1000000000000000000001 /* InterviewPrepApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InterviewPrepApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -202,6 +206,8 @@
 				E1000000000000000000008 /* Home */,
 				E1000000000000000000009 /* Onboarding */,
 				E100000000000000000000A /* Settings */,
+				B1000000000000000000016 /* LoadingView.swift */,
+				B1000000000000000000017 /* LoadingViewExample.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -323,6 +329,8 @@
 				A1000000000000000000012 /* OnboardingViewModel.swift in Sources */,
 				A1000000000000000000013 /* EditProfileView.swift in Sources */,
 				A1000000000000000000014 /* SettingsView.swift in Sources */,
+				A1000000000000000000016 /* LoadingView.swift in Sources */,
+				A1000000000000000000017 /* LoadingViewExample.swift in Sources */,
 				1D0D7B98E72B4CB4B1679BC2 /* AlertState.swift in Sources */,
 				A57FCC7CABC614AD09E4AD8D /* Loadable.swift in Sources */,
 				5A37C98D5DE719B2C340CC70 /* APIClient.swift in Sources */,

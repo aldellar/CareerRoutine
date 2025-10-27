@@ -17,8 +17,6 @@ class OnboardingViewModel: ObservableObject {
     @Published var hoursPerDay: Double = 2.0
     @Published var availableDays: Set<Weekday> = [.monday, .tuesday, .wednesday, .thursday, .friday]
     @Published var preferredTools: [String] = []
-    @Published var isGeneratingPlan: Bool = false
-    @Published var generationError: String?
     
     private let apiClient: APIClient
     private let storage: StorageService
@@ -70,48 +68,11 @@ class OnboardingViewModel: ObservableObject {
             preferredTools: preferredTools
         )
         
-        // Save profile first
+        // Save profile (but don't mark onboarding as complete yet)
         appState.saveProfile(profile)
         
-        // Trigger generation of both plan and prep pack
-        Task {
-            await generateInitialContent(profile: profile, appState: appState)
-        }
-    }
-    
-    private func generateInitialContent(profile: UserProfile, appState: AppState) async {
-        isGeneratingPlan = true
-        generationError = nil
-        
-        do {
-            // Convert profile to API format
-            let apiProfile = APIProfile.from(profile)
-            
-            // Generate weekly plan and prep pack in parallel
-            async let routineTask = apiClient.generateRoutine(profile: apiProfile)
-            async let prepTask = apiClient.generatePrep(profile: apiProfile)
-            
-            let (apiPlan, apiPrep) = try await (routineTask, prepTask)
-            
-            // Convert and save routine
-            let routine = convertToRoutine(apiPlan)
-            storage.saveRoutine(routine)
-            appState.saveRoutine(routine)
-            
-            // Convert and save prep pack
-            let prepPack = convertToPrepPack(apiPrep)
-            storage.savePrepPack(prepPack)
-            appState.savePrepPack(prepPack)
-            
-            isGeneratingPlan = false
-            
-        } catch let error as APIError {
-            generationError = error.displayMessage
-            isGeneratingPlan = false
-        } catch {
-            generationError = "Failed to generate your plan. Please try again."
-            isGeneratingPlan = false
-        }
+        // Set the flag to show loading view
+        appState.isGeneratingInitialContent = true
     }
     
     // MARK: - Conversion Helpers

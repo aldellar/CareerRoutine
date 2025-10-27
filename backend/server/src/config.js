@@ -31,7 +31,7 @@ const config = {
   // OpenAI
   openaiApiKey: process.env.OPENAI_API_KEY,
   openaiModel: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-  openaiTimeoutMs: parseInt(process.env.OPENAI_TIMEOUT_MS || '15000', 10),
+  openaiTimeoutMs: parseInt(process.env.OPENAI_TIMEOUT_MS || '60000', 10),  // 60 seconds for complex generation
   
   // CORS
   allowedOrigins: parseCorsOrigins(process.env.CORS_ORIGIN),

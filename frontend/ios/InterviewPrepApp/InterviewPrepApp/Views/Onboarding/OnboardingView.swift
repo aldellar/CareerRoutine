@@ -16,60 +16,6 @@ struct OnboardingView: View {
             ZStack {
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea()
-                
-                if viewModel.isGeneratingPlan {
-                    // Loading view while generating plan
-                    VStack(spacing: 24) {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .padding()
-                        
-                        Text("Setting up your interview prep plan...")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .multilineTextAlignment(.center)
-                        
-                        Text("This may take a moment as we generate your personalized weekly routine and prep materials.")
-                            .font(.body)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 32)
-                        
-                        if let error = viewModel.generationError {
-                            VStack(spacing: 12) {
-                                Text("Error")
-                                    .font(.headline)
-                                    .foregroundColor(.red)
-                                
-                                Text(error)
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.center)
-                                
-                                Button(action: {
-                                    viewModel.completeOnboarding(appState: appState)
-                                }) {
-                                    Text("Try Again")
-                                        .fontWeight(.semibold)
-                                        .padding()
-                                        .background(Color.blue)
-                                        .foregroundColor(.white)
-                                        .cornerRadius(12)
-                                }
-                                
-                                Button(action: {
-                                    // Skip generation and go to home
-                                    viewModel.isGeneratingPlan = false
-                                }) {
-                                    Text("Skip for Now")
-                                        .foregroundColor(.blue)
-                                }
-                            }
-                            .padding(.top, 24)
-                            .padding(.horizontal, 32)
-                        }
-                    }
-                } else {
                     VStack(spacing: 0) {
                         // Progress indicator
                         ProgressView(value: Double(viewModel.currentStep), total: 5)
@@ -141,7 +87,6 @@ struct OnboardingView: View {
                         }
                         .padding()
                     }
-                }
             }
             .navigationBarHidden(true)
         }

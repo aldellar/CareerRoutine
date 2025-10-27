@@ -9,34 +9,77 @@ import Foundation
 import Combine
 
 class NetworkService {
-    private let baseURL: String
-    private let session: URLSession
+    static let shared = NetworkService()
     
-    init(baseURL: String = "http://localhost:3000/api", session: URLSession = .shared) {
-        self.baseURL = baseURL
-        self.session = session
+    private let apiClient: APIClient
+    private let useMockData: Bool
+    
+    /// Initialize NetworkService
+    /// - Parameters:
+    ///   - apiClient: Optional APIClient instance (creates new one if nil)
+    ///   - useMockData: If true, returns mock data without API calls. Set to false to use real backend.
+    init(apiClient: APIClient? = nil, useMockData: Bool = false) {
+        // Use provided client or create a new one
+        self.apiClient = apiClient ?? APIClient()
+        self.useMockData = useMockData
+        
+        if useMockData {
+            print("⚠️ NetworkService: Running in MOCK mode (no real API calls)")
+            print("   To enable real API calls, set useMockData = false")
+        } else {
+            print("✅ NetworkService: Running in REAL API mode")
+            print("   Backend URL: \(APIConfig.baseURL)")
+        }
     }
     
     // MARK: - Generate Routine
     
     func generateRoutine(profile: UserProfile) async throws -> Routine {
-        // TODO: Connect to backend API
-        // For now, return mock data
-        return createMockRoutine()
+        print("🌐 NetworkService.generateRoutine called")
+        print("   - Mock mode: \(useMockData)")
+        print("   - Profile: \(profile.name), \(profile.targetRole)")
+        
+        if useMockData {
+            // Mock mode for offline development
+            print("   - Using MOCK data (8 second delay)")
+            try await Task.sleep(nanoseconds: 8_000_000_000)
+            return createMockRoutine()
+        }
+        
+        // REAL API CALL
+        print("   - Making REAL API call to backend...")
+        let apiProfile = APIProfile.from(profile)
+        let apiPlan = try await apiClient.generateRoutine(profile: apiProfile)
+        print("   - ✅ API response received, converting to Routine")
+        return convertToRoutine(apiPlan)
     }
     
     // MARK: - Generate Prep Pack
     
     func generatePrepPack(profile: UserProfile) async throws -> PrepPack {
-        // TODO: Connect to backend API
-        // For now, return mock data
-        return createMockPrepPack()
+        print("🌐 NetworkService.generatePrepPack called")
+        print("   - Mock mode: \(useMockData)")
+        print("   - Profile: \(profile.name), \(profile.targetRole)")
+        
+        if useMockData {
+            // Mock mode for offline development
+            print("   - Using MOCK data (8 second delay)")
+            try await Task.sleep(nanoseconds: 8_000_000_000)
+            return createMockPrepPack()
+        }
+        
+        // REAL API CALL
+        print("   - Making REAL API call to backend...")
+        let apiProfile = APIProfile.from(profile)
+        let apiPrep = try await apiClient.generatePrep(profile: apiProfile)
+        print("   - ✅ API response received, converting to PrepPack")
+        return convertToPrepPack(apiPrep)
     }
     
     // MARK: - Regenerate Resources
     
     func regenerateResources(profile: UserProfile, currentPack: PrepPack) async throws -> [Resource] {
-        // TODO: Connect to backend API
+        // TODO: Connect to backend reroll API
         // For now, return mock data
         return createMockResources()
     }
@@ -44,7 +87,7 @@ class NetworkService {
     // MARK: - Regenerate Mock Prompts
     
     func regenerateMockPrompts(profile: UserProfile, currentPack: PrepPack) async throws -> [String] {
-        // TODO: Connect to backend API
+        // TODO: Connect to backend reroll API
         // For now, return mock data
         return createMockPrompts()
     }
@@ -52,9 +95,126 @@ class NetworkService {
     // MARK: - Regenerate Time Allocations
     
     func regenerateTimeAllocations(profile: UserProfile, currentRoutine: Routine) async throws -> Routine {
-        // TODO: Connect to backend API
+        // TODO: Connect to backend reroll API
         // For now, return mock data
         return createMockRoutine()
+    }
+    
+    // MARK: - API Response Conversion
+    
+    private func convertToRoutine(_ apiPlan: APIPlan) -> Routine {
+        var weeklySchedule: [Weekday: [TimeBlock]] = [:]
+        
+        for (dayStr, apiBlocks) in apiPlan.timeBlocks {
+            guard let weekday = weekdayFrom(dayStr) else { continue }
+            weeklySchedule[weekday] = apiBlocks.map { block in
+                TimeBlock(
+                    title: block.label,
+                    description: block.label,
+                    startTime: block.start,
+                    endTime: block.end,
+                    category: inferCategory(from: block.label),
+                    resources: []
+                )
+            }
+        }
+        
+        return Routine(
+            version: apiPlan.version,
+            weeklySchedule: weeklySchedule,
+            weeklyMilestones: apiPlan.milestones
+        )
+    }
+    
+    private func convertToPrepPack(_ apiPrep: APIPrep) -> PrepPack {
+        let topicLadder = apiPrep.prepOutline.map { section in
+            PrepTopic(
+                name: section.section,
+                description: section.items.joined(separator: ". "),
+                priority: .high,
+                estimatedWeeks: 4,
+                subtopics: section.items
+            )
+        }
+        
+        let resources = apiPrep.resources.map { apiResource in
+            Resource(
+                title: apiResource.title,
+                url: apiResource.url,
+                description: "",
+                type: inferResourceType(from: apiResource.title)
+            )
+        }
+        
+        return PrepPack(
+            topicLadder: topicLadder,
+            practiceCadence: buildPracticeCadence(from: apiPrep.weeklyDrillPlan),
+            resources: resources,
+            mockInterviewPrompts: apiPrep.starterQuestions
+        )
+    }
+    
+    private func buildPracticeCadence(from drillPlan: [DrillDay]) -> String {
+        let daysDescription = drillPlan.map { day in
+            "\(day.day): \(day.drills.count) drills"
+        }.joined(separator: ", ")
+        return "Weekly drill plan: \(daysDescription)"
+    }
+    
+    private func weekdayFrom(_ str: String) -> Weekday? {
+        switch str {
+        case "Mon": return .monday
+        case "Tue": return .tuesday
+        case "Wed": return .wednesday
+        case "Thu": return .thursday
+        case "Fri": return .friday
+        case "Sat": return .saturday
+        case "Sun": return .sunday
+        default: return nil
+        }
+    }
+    
+    private func inferCategory(from label: String) -> TaskCategory {
+        let lower = label.lowercased()
+        if lower.contains("array") || lower.contains("string") 
+            || lower.contains("linked") || lower.contains("tree") 
+            || lower.contains("graph") {
+            return .dataStructures
+        } else if lower.contains("system design") {
+            return .systemDesign
+        } else if lower.contains("coding") || lower.contains("leetcode") 
+            || lower.contains("practice") {
+            return .coding
+        } else if lower.contains("behavioral") || lower.contains("star") {
+            return .behavioral
+        } else if lower.contains("project") {
+            return .projectWork
+        } else if lower.contains("reading") || lower.contains("study") {
+            return .reading
+        } else if lower.contains("mock") || lower.contains("interview") {
+            return .mockInterview
+        } else if lower.contains("review") {
+            return .review
+        } else {
+            return .coding
+        }
+    }
+    
+    private func inferResourceType(from title: String) -> ResourceType {
+        let lower = title.lowercased()
+        if lower.contains("video") || lower.contains("youtube") {
+            return .video
+        } else if lower.contains("book") {
+            return .book
+        } else if lower.contains("course") {
+            return .course
+        } else if lower.contains("leetcode") || lower.contains("hackerrank") {
+            return .practice
+        } else if lower.contains("doc") || lower.contains("documentation") {
+            return .documentation
+        } else {
+            return .article
+        }
     }
     
     // MARK: - Mock Data Generators (for frontend-only development)
