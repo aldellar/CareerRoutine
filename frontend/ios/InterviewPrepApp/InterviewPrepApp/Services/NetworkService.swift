@@ -466,10 +466,8 @@ class NetworkService {
         }
         
         // Validate stage
-        let validStages = ["Student", "Graduate", "New Grad", "Experienced"]
-        if !validStages.contains(profile.stage) {
-            print("⚠️ Warning: Unusual stage value: \(profile.stage)")
-        }
+        // currentStage is an enum, so validation is automatically handled by the type system
+        print("   - Stage: \(profile.currentStage.rawValue)")
         
         // Validate time budget
         if profile.timeBudgetHoursPerDay <= 0 || profile.timeBudgetHoursPerDay > 24 {
