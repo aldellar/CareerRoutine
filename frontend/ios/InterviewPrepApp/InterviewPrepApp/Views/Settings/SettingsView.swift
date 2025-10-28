@@ -24,9 +24,51 @@ struct SettingsView: View {
     @State private var regenerationProgress: Double = 0.0
     @State private var regenerationStatus: String = "Regenerating..."
     @State private var regenerationError: LoadingErrorState?
-    @State private var regenerationType: String = "routine"
+    @State private var regenerationType: RegenerationType = .routine
     @State private var isRegeneratingRoutine: Bool = false
     @State private var isRegeneratingPrepPack: Bool = false
+    
+    enum RegenerationType {
+        case routine
+        case prepPack
+        
+        var initialMessage: String {
+            switch self {
+            case .routine: return "Preparing to regenerate your weekly plan..."
+            case .prepPack: return "Preparing to regenerate your prep pack..."
+            }
+        }
+        
+        var progressMessages: [(progress: Double, message: String)] {
+            switch self {
+            case .routine:
+                return [
+                    (0.2, "Connecting to server..."),
+                    (0.4, "Generating your weekly schedule..."),
+                    (0.7, "Applying time allocations..."),
+                    (0.9, "Finalizing your weekly plan..."),
+                    (1.0, "Complete!")
+                ]
+            case .prepPack:
+                return [
+                    (0.2, "Connecting to server..."),
+                    (0.4, "Generating prep topics..."),
+                    (0.7, "Curating resources..."),
+                    (0.9, "Finalizing your prep pack..."),
+                    (1.0, "Complete!")
+                ]
+            }
+        }
+        
+        var stepLabels: (String, String, String) {
+            switch self {
+            case .routine:
+                return ("Routine", "Tasks", "Saving")
+            case .prepPack:
+                return ("Topics", "Resources", "Saving")
+            }
+        }
+    }
     
     var body: some View {
         List {
@@ -334,7 +376,11 @@ struct SettingsView: View {
                 statusText: regenerationStatus,
                 errorState: regenerationError,
                 onSuccess: {
+                    // Reset all flags when complete
                     isRegenerating = false
+                    isRegeneratingRoutine = false
+                    isRegeneratingPrepPack = false
+                    regenerationProgress = 0.0
                 },
                 onCancel: {
                     isRegenerating = false
@@ -346,12 +392,14 @@ struct SettingsView: View {
                 onRetry: {
                     regenerationError = nil
                     regenerationProgress = 0.0
-                    if regenerationType == "routine" {
+                    switch regenerationType {
+                    case .routine:
                         regenerateRoutine()
-                    } else {
+                    case .prepPack:
                         regeneratePrepPack()
                     }
-                }
+                },
+                stepLabels: regenerationType.stepLabels
             )
         }
     }
@@ -378,9 +426,9 @@ struct SettingsView: View {
         isRegenerating = true
         isRegeneratingRoutine = true
         regenerationProgress = 0.0
-        regenerationStatus = "Regenerating your weekly plan..."
         regenerationError = nil
-        regenerationType = "routine"
+        regenerationType = .routine
+        regenerationStatus = regenerationType.initialMessage
         
         guard let profile = appState.userProfile else {
             regenerationError = LoadingErrorState.custom(
@@ -392,41 +440,29 @@ struct SettingsView: View {
         }
         
         let networkService = NetworkService()
+        let progressMessages = regenerationType.progressMessages
         
         Task {
             do {
-                withAnimation {
-                    regenerationProgress = 0.2
-                    regenerationStatus = "Connecting to server..."
-                }
-                try await Task.sleep(nanoseconds: 500_000_000) // 0.5s
-                
-                withAnimation {
-                    regenerationProgress = 0.4
-                    regenerationStatus = "Generating weekly schedule..."
-                }
-                
-                let routine = try await networkService.generateRoutine(profile: profile)
-                
-                withAnimation {
-                    regenerationProgress = 0.7
-                    regenerationStatus = "Applying time allocations..."
-                }
-                try await Task.sleep(nanoseconds: 300_000_000) // 0.3s
-                
-                withAnimation {
-                    regenerationProgress = 0.9
-                    regenerationStatus = "Finalizing plan..."
-                }
-                
-                await MainActor.run {
-                    appState.saveRoutine(routine)
-                    appState.regenerateRoutine() // Increment version
-                }
-                
-                withAnimation {
-                    regenerationProgress = 1.0
-                    regenerationStatus = "Complete!"
+                for (progress, message) in progressMessages {
+                    withAnimation {
+                        regenerationProgress = progress
+                        regenerationStatus = message
+                    }
+                    
+                    // Only wait for these specific progress points
+                    if progress == 0.2 {
+                        try await Task.sleep(nanoseconds: 500_000_000) // 0.5s
+                        
+                        // Generate routine after connection
+                        let routine = try await networkService.generateRoutine(profile: profile)
+                        await MainActor.run {
+                            appState.saveRoutine(routine)
+                            appState.regenerateRoutine() // Increment version
+                        }
+                    } else if progress == 0.7 {
+                        try await Task.sleep(nanoseconds: 300_000_000) // 0.3s
+                    }
                 }
                 
             } catch {
@@ -469,9 +505,9 @@ struct SettingsView: View {
         isRegenerating = true
         isRegeneratingPrepPack = true
         regenerationProgress = 0.0
-        regenerationStatus = "Regenerating your prep pack..."
         regenerationError = nil
-        regenerationType = "preppack"
+        regenerationType = .prepPack
+        regenerationStatus = regenerationType.initialMessage
         
         guard let profile = appState.userProfile else {
             regenerationError = LoadingErrorState.custom(
@@ -483,40 +519,28 @@ struct SettingsView: View {
         }
         
         let networkService = NetworkService()
+        let progressMessages = regenerationType.progressMessages
         
         Task {
             do {
-                withAnimation {
-                    regenerationProgress = 0.2
-                    regenerationStatus = "Connecting to server..."
-                }
-                try await Task.sleep(nanoseconds: 500_000_000) // 0.5s
-                
-                withAnimation {
-                    regenerationProgress = 0.4
-                    regenerationStatus = "Generating prep topics..."
-                }
-                
-                let prepPack = try await networkService.generatePrepPack(profile: profile)
-                
-                withAnimation {
-                    regenerationProgress = 0.7
-                    regenerationStatus = "Curating resources..."
-                }
-                try await Task.sleep(nanoseconds: 300_000_000) // 0.3s
-                
-                withAnimation {
-                    regenerationProgress = 0.9
-                    regenerationStatus = "Finalizing prep pack..."
-                }
-                
-                await MainActor.run {
-                    appState.savePrepPack(prepPack)
-                }
-                
-                withAnimation {
-                    regenerationProgress = 1.0
-                    regenerationStatus = "Complete!"
+                for (progress, message) in progressMessages {
+                    withAnimation {
+                        regenerationProgress = progress
+                        regenerationStatus = message
+                    }
+                    
+                    // Only wait for these specific progress points
+                    if progress == 0.2 {
+                        try await Task.sleep(nanoseconds: 500_000_000) // 0.5s
+                        
+                        // Generate prep pack after connection
+                        let prepPack = try await networkService.generatePrepPack(profile: profile)
+                        await MainActor.run {
+                            appState.savePrepPack(prepPack)
+                        }
+                    } else if progress == 0.7 {
+                        try await Task.sleep(nanoseconds: 300_000_000) // 0.3s
+                    }
                 }
                 
             } catch {

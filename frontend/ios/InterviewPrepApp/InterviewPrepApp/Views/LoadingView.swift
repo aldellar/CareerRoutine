@@ -23,6 +23,27 @@ struct LoadingView: View {
     let onCancel: () -> Void
     let onRetry: () -> Void
     
+    // Dynamic step labels
+    let stepLabels: (String, String, String)
+    
+    init(
+        progress: Double,
+        statusText: String,
+        errorState: LoadingErrorState?,
+        onSuccess: @escaping () -> Void,
+        onCancel: @escaping () -> Void,
+        onRetry: @escaping () -> Void,
+        stepLabels: (String, String, String) = ("Step 1", "Step 2", "Step 3")
+    ) {
+        self.progress = progress
+        self.statusText = statusText
+        self.errorState = errorState
+        self.onSuccess = onSuccess
+        self.onCancel = onCancel
+        self.onRetry = onRetry
+        self.stepLabels = stepLabels
+    }
+    
     private let motivationalTips = [
         "Pro tip: Stay consistent — small progress compounds.",
         "Focus on understanding, not just solving.",
@@ -131,17 +152,17 @@ struct LoadingView: View {
                     HStack(spacing: 4) {
                         progressStepIndicator(
                             step: 1,
-                            label: "Routine",
+                            label: stepLabels.0,
                             isActive: progress >= 0 && progress < 0.33
                         )
                         progressStepIndicator(
                             step: 2,
-                            label: "Prep Pack",
+                            label: stepLabels.1,
                             isActive: progress >= 0.33 && progress < 0.66
                         )
                         progressStepIndicator(
                             step: 3,
-                            label: "Saving",
+                            label: stepLabels.2,
                             isActive: progress >= 0.66
                         )
                     }
