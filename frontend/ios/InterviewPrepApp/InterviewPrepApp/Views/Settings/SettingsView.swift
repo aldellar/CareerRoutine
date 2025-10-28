@@ -19,6 +19,15 @@ struct SettingsView: View {
     @State private var healthCheckResult: String?
     @State private var showingHealthCheck = false
     
+    // Loading state for regeneration
+    @State private var isRegenerating: Bool = false
+    @State private var regenerationProgress: Double = 0.0
+    @State private var regenerationStatus: String = "Regenerating..."
+    @State private var regenerationError: LoadingErrorState?
+    @State private var regenerationType: String = "routine"
+    @State private var isRegeneratingRoutine: Bool = false
+    @State private var isRegeneratingPrepPack: Bool = false
+    
     var body: some View {
         List {
             // Profile Section
@@ -79,12 +88,18 @@ struct SettingsView: View {
                             regenerateRoutine()
                         }) {
                             HStack(spacing: 4) {
-                                Image(systemName: "arrow.clockwise")
-                                Text("Regenerate")
+                                if isRegeneratingRoutine {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Image(systemName: "arrow.clockwise")
+                                }
+                                Text(isRegeneratingRoutine ? "Regenerating..." : "Regenerate")
                             }
                             .font(.body)
                             .foregroundColor(.blue)
                         }
+                        .disabled(isRegeneratingRoutine || isRegeneratingPrepPack)
                     }
                     .padding(.vertical, 4)
                 } else {
@@ -119,12 +134,18 @@ struct SettingsView: View {
                             regeneratePrepPack()
                         }) {
                             HStack(spacing: 4) {
-                                Image(systemName: "arrow.clockwise")
-                                Text("Regenerate")
+                                if isRegeneratingPrepPack {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Image(systemName: "arrow.clockwise")
+                                }
+                                Text(isRegeneratingPrepPack ? "Regenerating..." : "Regenerate")
                             }
                             .font(.body)
                             .foregroundColor(.blue)
                         }
+                        .disabled(isRegeneratingRoutine || isRegeneratingPrepPack)
                     }
                     .padding(.vertical, 4)
                 } else {
@@ -307,6 +328,32 @@ struct SettingsView: View {
         } message: {
             Text("Are you sure you want to delete all your data? This action cannot be undone.")
         }
+        .fullScreenCover(isPresented: $isRegenerating) {
+            LoadingView(
+                progress: regenerationProgress,
+                statusText: regenerationStatus,
+                errorState: regenerationError,
+                onSuccess: {
+                    isRegenerating = false
+                },
+                onCancel: {
+                    isRegenerating = false
+                    regenerationProgress = 0.0
+                    regenerationError = nil
+                    isRegeneratingRoutine = false
+                    isRegeneratingPrepPack = false
+                },
+                onRetry: {
+                    regenerationError = nil
+                    regenerationProgress = 0.0
+                    if regenerationType == "routine" {
+                        regenerateRoutine()
+                    } else {
+                        regeneratePrepPack()
+                    }
+                }
+            )
+        }
     }
     
     private func generateRoutine() {
@@ -326,8 +373,78 @@ struct SettingsView: View {
     }
     
     private func regenerateRoutine() {
-        appState.regenerateRoutine()
-        generateRoutine()
+        guard !isRegeneratingRoutine && !isRegeneratingPrepPack else { return }
+        
+        isRegenerating = true
+        isRegeneratingRoutine = true
+        regenerationProgress = 0.0
+        regenerationStatus = "Regenerating your weekly plan..."
+        regenerationError = nil
+        regenerationType = "routine"
+        
+        guard let profile = appState.userProfile else {
+            regenerationError = LoadingErrorState.custom(
+                title: "Profile Missing",
+                message: "Please set up your profile first."
+            )
+            isRegeneratingRoutine = false
+            return
+        }
+        
+        let networkService = NetworkService()
+        
+        Task {
+            do {
+                withAnimation {
+                    regenerationProgress = 0.2
+                    regenerationStatus = "Connecting to server..."
+                }
+                try await Task.sleep(nanoseconds: 500_000_000) // 0.5s
+                
+                withAnimation {
+                    regenerationProgress = 0.4
+                    regenerationStatus = "Generating weekly schedule..."
+                }
+                
+                let routine = try await networkService.generateRoutine(profile: profile)
+                
+                withAnimation {
+                    regenerationProgress = 0.7
+                    regenerationStatus = "Applying time allocations..."
+                }
+                try await Task.sleep(nanoseconds: 300_000_000) // 0.3s
+                
+                withAnimation {
+                    regenerationProgress = 0.9
+                    regenerationStatus = "Finalizing plan..."
+                }
+                
+                await MainActor.run {
+                    appState.saveRoutine(routine)
+                    appState.regenerateRoutine() // Increment version
+                }
+                
+                withAnimation {
+                    regenerationProgress = 1.0
+                    regenerationStatus = "Complete!"
+                }
+                
+            } catch {
+                print("Error during regeneration: \(error)")
+                await MainActor.run {
+                    let apiError = APIError.from(error: error)
+                    switch apiError {
+                    case .networkUnavailable, .timeout:
+                        regenerationError = .network()
+                    case .server:
+                        regenerationError = .serverError()
+                    default:
+                        regenerationError = .generic()
+                    }
+                    isRegeneratingRoutine = false
+                }
+            }
+        }
     }
     
     private func generatePrepPack() {
@@ -347,7 +464,77 @@ struct SettingsView: View {
     }
     
     private func regeneratePrepPack() {
-        generatePrepPack()
+        guard !isRegeneratingRoutine && !isRegeneratingPrepPack else { return }
+        
+        isRegenerating = true
+        isRegeneratingPrepPack = true
+        regenerationProgress = 0.0
+        regenerationStatus = "Regenerating your prep pack..."
+        regenerationError = nil
+        regenerationType = "preppack"
+        
+        guard let profile = appState.userProfile else {
+            regenerationError = LoadingErrorState.custom(
+                title: "Profile Missing",
+                message: "Please set up your profile first."
+            )
+            isRegeneratingPrepPack = false
+            return
+        }
+        
+        let networkService = NetworkService()
+        
+        Task {
+            do {
+                withAnimation {
+                    regenerationProgress = 0.2
+                    regenerationStatus = "Connecting to server..."
+                }
+                try await Task.sleep(nanoseconds: 500_000_000) // 0.5s
+                
+                withAnimation {
+                    regenerationProgress = 0.4
+                    regenerationStatus = "Generating prep topics..."
+                }
+                
+                let prepPack = try await networkService.generatePrepPack(profile: profile)
+                
+                withAnimation {
+                    regenerationProgress = 0.7
+                    regenerationStatus = "Curating resources..."
+                }
+                try await Task.sleep(nanoseconds: 300_000_000) // 0.3s
+                
+                withAnimation {
+                    regenerationProgress = 0.9
+                    regenerationStatus = "Finalizing prep pack..."
+                }
+                
+                await MainActor.run {
+                    appState.savePrepPack(prepPack)
+                }
+                
+                withAnimation {
+                    regenerationProgress = 1.0
+                    regenerationStatus = "Complete!"
+                }
+                
+            } catch {
+                print("Error during regeneration: \(error)")
+                await MainActor.run {
+                    let apiError = APIError.from(error: error)
+                    switch apiError {
+                    case .networkUnavailable, .timeout:
+                        regenerationError = .network()
+                    case .server:
+                        regenerationError = .serverError()
+                    default:
+                        regenerationError = .generic()
+                    }
+                    isRegeneratingPrepPack = false
+                }
+            }
+        }
     }
     
     // MARK: - Developer Tools
