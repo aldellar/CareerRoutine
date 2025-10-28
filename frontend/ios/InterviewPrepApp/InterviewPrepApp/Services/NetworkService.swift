@@ -147,8 +147,7 @@ class NetworkService {
                 TimeBlock(
                     title: block.label,
                     description: block.label,
-                    startTime: block.start,
-                    endTime: block.end,
+                    durationHours: block.durationHours,
                     category: inferCategory(from: block.label),
                     resources: []
                 )
@@ -260,16 +259,14 @@ class NetworkService {
             TimeBlock(
                 title: "Arrays & Strings Review",
                 description: "Review fundamental array and string manipulation techniques",
-                startTime: "09:00",
-                endTime: "10:30",
+                durationHours: 1.5,
                 category: .dataStructures,
                 resources: ["LeetCode Easy problems", "Cracking the Coding Interview Ch. 1"]
             ),
             TimeBlock(
                 title: "Coding Practice",
                 description: "Solve 2-3 easy problems on LeetCode",
-                startTime: "14:00",
-                endTime: "15:30",
+                durationHours: 1.5,
                 category: .coding,
                 resources: ["LeetCode", "HackerRank"]
             )
@@ -279,16 +276,14 @@ class NetworkService {
             TimeBlock(
                 title: "Linked Lists",
                 description: "Study linked list operations and common patterns",
-                startTime: "09:00",
-                endTime: "10:30",
+                durationHours: 1.5,
                 category: .dataStructures,
                 resources: ["Visualgo.net", "LeetCode patterns"]
             ),
             TimeBlock(
                 title: "Behavioral Prep",
                 description: "Prepare STAR stories for common behavioral questions",
-                startTime: "19:00",
-                endTime: "20:00",
+                durationHours: 1.0,
                 category: .behavioral,
                 resources: ["Amazon Leadership Principles", "Google's hiring guide"]
             )
@@ -298,16 +293,14 @@ class NetworkService {
             TimeBlock(
                 title: "Stack & Queue",
                 description: "Learn stack and queue implementations and applications",
-                startTime: "09:00",
-                endTime: "10:30",
+                durationHours: 1.5,
                 category: .dataStructures,
                 resources: ["GeeksforGeeks", "YouTube tutorials"]
             ),
             TimeBlock(
                 title: "Project Work",
                 description: "Work on personal iOS project for portfolio",
-                startTime: "15:00",
-                endTime: "17:00",
+                durationHours: 2.0,
                 category: .projectWork,
                 resources: ["Swift documentation", "SwiftUI tutorials"]
             )
@@ -317,16 +310,14 @@ class NetworkService {
             TimeBlock(
                 title: "Trees & Graphs",
                 description: "Study tree traversals and basic graph algorithms",
-                startTime: "09:00",
-                endTime: "11:00",
+                durationHours: 2.0,
                 category: .dataStructures,
                 resources: ["Binary tree visualizer", "Graph theory basics"]
             ),
             TimeBlock(
                 title: "Mock Interview",
                 description: "Practice with a peer or use Pramp",
-                startTime: "18:00",
-                endTime: "19:00",
+                durationHours: 1.0,
                 category: .mockInterview,
                 resources: ["Pramp", "Interviewing.io"]
             )
@@ -336,16 +327,14 @@ class NetworkService {
             TimeBlock(
                 title: "Weekly Review",
                 description: "Review all problems solved this week and identify patterns",
-                startTime: "09:00",
-                endTime: "10:30",
+                durationHours: 1.5,
                 category: .review,
                 resources: ["Personal notes", "Anki flashcards"]
             ),
             TimeBlock(
                 title: "System Design Reading",
                 description: "Read about scalable system design concepts",
-                startTime: "14:00",
-                endTime: "15:30",
+                durationHours: 1.5,
                 category: .systemDesign,
                 resources: ["System Design Primer", "Grokking System Design"]
             )

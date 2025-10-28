@@ -416,9 +416,10 @@ SAFETY AND RELIABILITY REQUIREMENTS:
  * Validates data quality before returning to user
  * @param {object} data - Data to validate
  * @param {string} expectedType - Expected data type
+ * @param {object} profile - Optional user profile for time budget validation
  * @returns {object} Validation result
  */
-export function validateDataQuality(data, expectedType = 'unknown') {
+export function validateDataQuality(data, expectedType = 'unknown', profile = null) {
   const issues = [];
 
   if (!data || typeof data !== 'object') {
@@ -430,6 +431,18 @@ export function validateDataQuality(data, expectedType = 'unknown') {
   if (expectedType === 'plan' || expectedType === 'routine') {
     if (!data.timeBlocks) issues.push('Missing timeBlocks');
     if (!data.version) issues.push('Missing version');
+    
+    // Validate time budget compliance if profile provided
+    if (profile && data.timeBlocks && typeof data.timeBlocks === 'object') {
+      const timeBudgetIssues = validateTimeBudget(data.timeBlocks, profile.timeBudgetHoursPerDay);
+      if (timeBudgetIssues.length > 0) {
+        issues.push(...timeBudgetIssues);
+        logger.warn('Time budget validation failed', {
+          issues: timeBudgetIssues,
+          timeBudget: profile.timeBudgetHoursPerDay
+        });
+      }
+    }
   }
 
   if (expectedType === 'prep') {
@@ -447,5 +460,35 @@ export function validateDataQuality(data, expectedType = 'unknown') {
     issues,
     quality: issues.length > 0 ? 'low' : 'high',
   };
+}
+
+/**
+ * Validates that time block durations sum correctly to time budget
+ * @param {object} timeBlocks - Time blocks object keyed by day
+ * @param {number} timeBudgetHours - Expected total hours per day
+ * @returns {array} Array of validation issues
+ */
+function validateTimeBudget(timeBlocks, timeBudgetHours) {
+  const issues = [];
+  const tolerance = 0.1; // Allow 0.1 hour (6 minutes) tolerance for rounding
+  
+  for (const [day, blocks] of Object.entries(timeBlocks)) {
+    if (!Array.isArray(blocks)) continue;
+    if (blocks.length === 0) continue; // Empty days are okay
+    
+    const totalHours = blocks.reduce((sum, block) => {
+      return sum + (block.durationHours || 0);
+    }, 0);
+    
+    const difference = Math.abs(totalHours - timeBudgetHours);
+    
+    if (difference > tolerance) {
+      issues.push(
+        `${day}: Total duration is ${totalHours.toFixed(2)}h, expected ${timeBudgetHours}h (difference: ${difference.toFixed(2)}h)`
+      );
+    }
+  }
+  
+  return issues;
 }
 

@@ -220,16 +220,13 @@ struct TaskCard: View {
                         .foregroundColor(statusColor)
                 }
                 
-                // Time
+                // Duration
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(block.startTime)
+                    Text(block.durationDisplay)
                         .font(.caption)
                         .fontWeight(.semibold)
-                    Text(block.endTime)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
                 }
-                .frame(width: 50)
+                .frame(width: 60)
                 
                 // Content
                 VStack(alignment: .leading, spacing: 8) {

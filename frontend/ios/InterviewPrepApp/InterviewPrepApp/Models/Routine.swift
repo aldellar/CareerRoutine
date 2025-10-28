@@ -40,8 +40,7 @@ struct TimeBlock: Codable, Identifiable {
     let id: UUID
     var title: String
     var description: String
-    var startTime: String // e.g., "09:00"
-    var endTime: String   // e.g., "10:30"
+    var durationHours: Double // Duration in hours (e.g., 1.5)
     var category: TaskCategory
     var resources: [String]
     
@@ -49,18 +48,35 @@ struct TimeBlock: Codable, Identifiable {
         id: UUID = UUID(),
         title: String,
         description: String,
-        startTime: String,
-        endTime: String,
+        durationHours: Double,
         category: TaskCategory,
         resources: [String] = []
     ) {
         self.id = id
         self.title = title
         self.description = description
-        self.startTime = startTime
-        self.endTime = endTime
+        self.durationHours = durationHours
         self.category = category
         self.resources = resources
+    }
+    
+    var durationDisplay: String {
+        if durationHours == 1.0 {
+            return "1 hour"
+        } else if durationHours == Double(Int(durationHours)) {
+            return "\(Int(durationHours)) hours"
+        } else if durationHours < 1.0 {
+            let minutes = Int(durationHours * 60)
+            return "\(minutes) min"
+        } else {
+            let hours = Int(durationHours)
+            let minutes = Int((durationHours - Double(hours)) * 60)
+            if minutes == 0 {
+                return "\(hours) hours"
+            } else {
+                return "\(hours)h \(minutes)m"
+            }
+        }
     }
 }
 

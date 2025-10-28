@@ -97,8 +97,8 @@ router.post('/routine', async (req, res, next) => {
       // Filter unsafe content from plan
       plan = filterLLMOutput(plan, 'plan');
 
-      // Validate data quality
-      const qualityCheck = validateDataQuality(plan, 'plan');
+      // Validate data quality (including time budget)
+      const qualityCheck = validateDataQuality(plan, 'plan', profile);
       if (!qualityCheck.valid) {
         logger.warn({ traceId: req.traceId, issues: qualityCheck.issues }, 'Low quality data detected');
       }

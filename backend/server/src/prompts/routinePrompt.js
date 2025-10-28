@@ -25,12 +25,13 @@ Your task is to generate a structured weekly routine plan that helps them prepar
 CRITICAL REQUIREMENTS:
 - Output ONLY valid JSON matching the provided schema
 - No markdown, no code blocks, no commentary, no extra fields
-- All time values must use 24-hour format (HH:MM)
+- All duration values must be in hours (e.g., 1.5, 2.0, 0.5)
+- Task durations MUST sum exactly to the user's daily time budget - no more, no less
+- Example: 2 hours/day → tasks like [0.5, 0.5, 1.0] or [0.75, 0.75, 0.5]
 - Respect the user's time budget and available days strictly
-- Create time blocks that are 45-60 minutes with 15-minute breaks
-- Include 3-4 focused blocks per day
-- Always include daily Applications/Networking time
-- Sequence: DS&A → Role-specific → Portfolio/Applications
+- Divide the daily time budget into 3-5 focused tasks (based on budget size)
+- Always include Applications/Networking tasks
+- Mix: DS&A → Role-specific → Portfolio/Applications
 - Generate blocks for Monday through Friday at minimum
 - For days not in availableDays, create empty arrays
 - Include 3-6 meaningful weekly milestones
@@ -63,19 +64,23 @@ Daily Time Budget: ${profile.timeBudgetHoursPerDay} hours
 Available Days: ${profile.availableDays.join(', ')}${constraintsText}
 
 REQUIREMENTS:
-1. Create time-boxed study blocks (45-60 min each, 15-min breaks)
-2. Allocate ${profile.timeBudgetHoursPerDay} hours per day across 3-4 blocks
-3. Cover Monday through Friday with the following daily focus areas:
+1. CRITICAL: Task durations MUST sum exactly to ${profile.timeBudgetHoursPerDay} hours per day
+   Example: If user has 2 hours/day, tasks could be: [0.5h, 0.5h, 1.0h] = 2 hours total
+2. Split ${profile.timeBudgetHoursPerDay} hours into 3-5 tasks per day based on budget
+   - 2 hours/day → 3-4 tasks
+   - 3-4 hours/day → 4-5 tasks
+3. Each task duration should be 0.5 to 1.5 hours (not more than 2 hours)
+4. Cover Monday through Friday with daily focus areas:
    - Data Structures & Algorithms practice
    - Role-specific preparation (e.g., iOS/Swift for iOS roles, system design)
    - Portfolio projects or code reviews
-   - Applications and networking (DAILY - at least 30 min)
-4. For days NOT in available days [${profile.availableDays.join(', ')}], create empty arrays
-5. Suggest 3-6 weekly milestones (e.g., "Complete 10 medium LC problems")
-6. Provide 4-8 curated resources with actual URLs (LeetCode, YouTube, books, courses)
-7. Use realistic times (e.g., 09:00-09:45, 10:00-10:45)
-8. Set weekOf to: ${weekOf}
-9. Set version to 1
+   - Applications and networking (DAILY - at least 0.5 hours)
+5. For days NOT in available days [${profile.availableDays.join(', ')}], create empty arrays
+6. Double-check: Sum of all task durations = ${profile.timeBudgetHoursPerDay} hours for each active day
+7. Suggest 3-6 weekly milestones (e.g., "Complete 10 medium LC problems")
+8. Provide 4-8 curated resources with actual URLs (LeetCode, YouTube, books, courses)
+9. Set weekOf to: ${weekOf}
+10. Set version to 1
 
 Output the complete plan as valid JSON.`;
 

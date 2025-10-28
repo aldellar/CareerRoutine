@@ -23,20 +23,17 @@ struct APIPlan: Codable {
             timeBlocks: [
                 "Mon": [
                     APITimeBlock(
-                        start: "09:00",
-                        end: "10:30",
+                        durationHours: 1.5,
                         label: "Arrays & Strings Review"
                     ),
                     APITimeBlock(
-                        start: "14:00",
-                        end: "15:30",
+                        durationHours: 1.5,
                         label: "LeetCode Practice"
                     )
                 ],
                 "Tue": [
                     APITimeBlock(
-                        start: "09:00",
-                        end: "10:30",
+                        durationHours: 1.5,
                         label: "Linked Lists"
                     )
                 ],
@@ -80,8 +77,7 @@ struct APIPlan: Codable {
 
 /// Time block model (matches backend schema)
 struct APITimeBlock: Codable {
-    let start: String  // HH:MM format
-    let end: String    // HH:MM format
+    let durationHours: Double  // Duration in hours (e.g., 1.5)
     let label: String
 }
 

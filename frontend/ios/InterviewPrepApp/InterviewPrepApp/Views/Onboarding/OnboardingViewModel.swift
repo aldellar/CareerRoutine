@@ -86,8 +86,7 @@ class OnboardingViewModel: ObservableObject {
                 TimeBlock(
                     title: block.label,
                     description: block.label,
-                    startTime: block.start,
-                    endTime: block.end,
+                    durationHours: block.durationHours,
                     category: inferCategory(from: block.label),
                     resources: []
                 )

@@ -188,8 +188,7 @@ class RerollViewModel: ObservableObject {
             let dayKey = shortNameFor(weekday)
             timeBlocks[dayKey] = blocks.map { block in
                 APITimeBlock(
-                    start: block.startTime,
-                    end: block.endTime,
+                    durationHours: block.durationHours,
                     label: block.title
                 )
             }
@@ -249,8 +248,7 @@ class RerollViewModel: ObservableObject {
                 TimeBlock(
                     title: block.label,
                     description: block.label,
-                    startTime: block.start,
-                    endTime: block.end,
+                    durationHours: block.durationHours,
                     category: inferCategory(from: block.label),
                     resources: []
                 )
