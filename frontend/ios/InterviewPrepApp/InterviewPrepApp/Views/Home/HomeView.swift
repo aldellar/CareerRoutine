@@ -96,8 +96,9 @@ struct TabButton: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 4) {
-                Image(systemName: isSelected ? "\(icon).fill" : icon)
+                Image(systemName: icon)
                     .font(.title3)
+                    .symbolVariant(isSelected ? .fill : .none)
                 
                 Text(title)
                     .font(.caption)
