@@ -52,10 +52,13 @@ class AppState: ObservableObject {
     // MARK: - Routine Management
     
     func saveRoutine(_ routine: Routine) {
+        print("💾 Saving routine - Version \(routine.version)")
         var updatedRoutine = routine
         updatedRoutine.updatedAt = Date()
         self.currentRoutine = updatedRoutine
         storageService.saveRoutine(updatedRoutine)
+        
+        print("   - Routine saved with \(updatedRoutine.weeklySchedule.count) days scheduled")
         
         // Generate daily tasks for the current week
         generateDailyTasksFromRoutine(updatedRoutine)
@@ -72,8 +75,27 @@ class AppState: ObservableObject {
     }
     
     private func generateDailyTasksFromRoutine(_ routine: Routine) {
+        print("📋 Generating daily tasks from routine")
         let calendar = Calendar.current
         let today = Date()
+        
+        // Clear old tasks for the current week before generating new ones
+        let startOfWeek = calendar.startOfDay(for: today)
+        guard let endOfWeek = calendar.date(byAdding: .day, value: 6, to: startOfWeek) else {
+            print("⚠️ Could not calculate end of week")
+            return
+        }
+        
+        // Remove tasks from the current week (old tasks with IDs that no longer exist in the routine)
+        let routineBlockIds = Set(routine.weeklySchedule.values.flatMap { $0.map { $0.id } })
+        dailyTasks.removeAll { task in
+            let taskDate = calendar.startOfDay(for: task.date)
+            let isInCurrentWeek = taskDate >= startOfWeek && taskDate <= endOfWeek
+            let isOldTask = !routineBlockIds.contains(task.timeBlockId)
+            return isInCurrentWeek && isOldTask
+        }
+        
+        print("   - Cleared old tasks, generating new ones")
         
         // Generate tasks for the next 7 days
         for dayOffset in 0..<7 {
@@ -95,11 +117,13 @@ class AppState: ObservableObject {
                             status: .pending
                         )
                         dailyTasks.append(newTask)
+                        print("   - Created task for \(weekday.rawValue): \(block.title)")
                     }
                 }
             }
         }
         
+        print("   - Total tasks created: \(dailyTasks.count)")
         storageService.saveDailyTasks(dailyTasks)
     }
     
@@ -288,10 +312,14 @@ class AppState: ObservableObject {
     // MARK: - Prep Pack Management
     
     func savePrepPack(_ pack: PrepPack) {
+        print("💾 Saving prep pack")
+        print("   - Topics: \(pack.topicLadder.count)")
+        print("   - Resources: \(pack.resources.count)")
         var updatedPack = pack
         updatedPack.updatedAt = Date()
         self.prepPack = updatedPack
         storageService.savePrepPack(updatedPack)
+        print("   - Prep pack saved successfully")
     }
     
     func regenerateResources() {

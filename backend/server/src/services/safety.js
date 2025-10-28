@@ -11,6 +11,7 @@
  */
 
 import logger from '../utils/logger.js';
+import { storeEvalLog } from '../utils/logAnalysis.js';
 
 /**
  * RISKY CONTENT PATTERNS
@@ -347,7 +348,7 @@ export function createFallbackResponse(type, profile) {
  * @param {number} params.tokens - Token count
  * @param {number} params.latency - Request latency in ms
  */
-export function logLLMInteraction({
+export async function logLLMInteraction({
   traceId,
   model,
   prompt,
@@ -369,12 +370,15 @@ export function logLLMInteraction({
     responseLength: response?.length || 0,
     hasURLs: /http/i.test(response || ''),
     hasHighRisk: riskAssessment?.level === RiskLevel.HIGH_RISK,
+    // Store full prompt and response for refinement analysis
+    prompt,
+    response,
   };
 
   logger.info(logEntry, 'LLM interaction logged for safety evaluation');
 
-  // In production, you could send this to a monitoring service
-  // For eval loops and safety improvements
+  // Store to file for evaluation analysis
+  await storeEvalLog(logEntry);
 }
 
 /**

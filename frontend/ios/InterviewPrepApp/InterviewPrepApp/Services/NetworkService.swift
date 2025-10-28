@@ -278,90 +278,19 @@ class NetworkService {
         print("   - Task duration 2: \(taskDuration2) hours")
         print("   - Total: \(taskDuration1 + taskDuration2) hours")
         
-        let mondayBlocks = [
-            TimeBlock(
-                title: "Arrays & Strings Review",
-                description: "Review fundamental array and string manipulation techniques",
-                durationHours: taskDuration1,
-                category: .dataStructures,
-                resources: ["LeetCode Easy problems", "Cracking the Coding Interview Ch. 1"]
-            ),
-            TimeBlock(
-                title: "Coding Practice",
-                description: "Solve 2-3 easy problems on LeetCode",
-                durationHours: taskDuration2,
-                category: .coding,
-                resources: ["LeetCode", "HackerRank"]
-            )
-        ]
+        // Generate random seed based on current time to ensure variety
+        let randomSeed = UInt64(Date().timeIntervalSince1970)
+        var random = SeedableRandomGenerator(seed: randomSeed)
         
-        let tuesdayBlocks = [
-            TimeBlock(
-                title: "Linked Lists",
-                description: "Study linked list operations and common patterns",
-                durationHours: taskDuration1,
-                category: .dataStructures,
-                resources: ["Visualgo.net", "LeetCode patterns"]
-            ),
-            TimeBlock(
-                title: "Behavioral Prep",
-                description: "Prepare STAR stories for common behavioral questions",
-                durationHours: taskDuration2,
-                category: .behavioral,
-                resources: ["Amazon Leadership Principles", "Google's hiring guide"]
-            )
-        ]
+        // Pool of tasks to choose from
+        let taskPool = generateTaskPool(timeBudget: timeBudget, randomSeed: randomSeed)
         
-        let wednesdayBlocks = [
-            TimeBlock(
-                title: "Stack & Queue",
-                description: "Learn stack and queue implementations and applications",
-                durationHours: taskDuration1,
-                category: .dataStructures,
-                resources: ["GeeksforGeeks", "YouTube tutorials"]
-            ),
-            TimeBlock(
-                title: "Project Work",
-                description: "Work on personal iOS project for portfolio",
-                durationHours: taskDuration2,
-                category: .projectWork,
-                resources: ["Swift documentation", "SwiftUI tutorials"]
-            )
-        ]
-        
-        let thursdayBlocks = [
-            TimeBlock(
-                title: "Trees & Graphs",
-                description: "Study tree traversals and basic graph algorithms",
-                durationHours: taskDuration1,
-                category: .dataStructures,
-                resources: ["Binary tree visualizer", "Graph theory basics"]
-            ),
-            TimeBlock(
-                title: "Mock Interview",
-                description: "Practice with a peer or use Pramp",
-                durationHours: taskDuration2,
-                category: .mockInterview,
-                resources: ["Pramp", "Interviewing.io"]
-            )
-        ]
-        
-        let fridayBlocks = [
-            TimeBlock(
-                title: "Weekly Review",
-                description: "Review all problems solved this week and identify patterns",
-                durationHours: taskDuration1,
-                category: .review,
-                resources: ["Personal notes", "Anki flashcards"]
-            ),
-            TimeBlock(
-                title: "System Design Reading",
-                description: "Read about scalable system design concepts",
-                durationHours: taskDuration2,
-                category: .systemDesign,
-                resources: ["System Design Primer", "Grokking System Design"]
-            )
-        ]
+        // Create schedule with randomized tasks
+        let mondayBlocks = selectRandomTasks(from: taskPool.monday, count: 2, using: &random)
+        let tuesdayBlocks = selectRandomTasks(from: taskPool.tuesday, count: 2, using: &random)
+        let wednesdayBlocks = selectRandomTasks(from: taskPool.wednesday, count: 2, using: &random)
+        let thursdayBlocks = selectRandomTasks(from: taskPool.thursday, count: 2, using: &random)
+        let fridayBlocks = selectRandomTasks(from: taskPool.friday, count: 2, using: &random)
         
         return Routine(
             weeklySchedule: [
@@ -378,6 +307,83 @@ class NetworkService {
                 "Complete one mock interview"
             ]
         )
+    }
+    
+    private struct TaskPool {
+        let monday: [TimeBlock]
+        let tuesday: [TimeBlock]
+        let wednesday: [TimeBlock]
+        let thursday: [TimeBlock]
+        let friday: [TimeBlock]
+    }
+    
+    private func generateTaskPool(timeBudget: Double, randomSeed: UInt64) -> TaskPool {
+        let duration1 = round(timeBudget * 0.6 * 4) / 4
+        let duration2 = timeBudget - duration1
+        
+        // Monday options
+        let mondayOptions = [
+            TimeBlock(title: "Arrays & Strings Review", description: "Review fundamental array and string manipulation techniques", durationHours: duration1, category: .dataStructures, resources: ["LeetCode Easy problems", "Cracking the Coding Interview Ch. 1"]),
+            TimeBlock(title: "Hash Maps & Sets", description: "Master hash map operations and when to use sets", durationHours: duration1, category: .dataStructures, resources: ["LeetCode problems", "Hash table visualizer"]),
+            TimeBlock(title: "Coding Practice", description: "Solve 2-3 easy problems on LeetCode", durationHours: duration2, category: .coding, resources: ["LeetCode", "HackerRank"]),
+            TimeBlock(title: "Algorithm Patterns", description: "Study common algorithm patterns and when to apply them", durationHours: duration1, category: .coding, resources: ["LeetCode patterns", "Algorithm design"])
+        ]
+        
+        // Tuesday options
+        let tuesdayOptions = [
+            TimeBlock(title: "Linked Lists", description: "Study linked list operations and common patterns", durationHours: duration1, category: .dataStructures, resources: ["Visualgo.net", "LeetCode patterns"]),
+            TimeBlock(title: "Trees & Binary Search Trees", description: "Learn tree traversals and BST operations", durationHours: duration1, category: .dataStructures, resources: ["Tree visualizer", "BST operations"]),
+            TimeBlock(title: "Behavioral Prep", description: "Prepare STAR stories for common behavioral questions", durationHours: duration2, category: .behavioral, resources: ["Amazon Leadership Principles", "Google's hiring guide"]),
+            TimeBlock(title: "Communication Skills", description: "Practice explaining your thought process out loud", durationHours: duration2, category: .behavioral, resources: ["Practice questions", "Recording yourself"])
+        ]
+        
+        // Wednesday options
+        let wednesdayOptions = [
+            TimeBlock(title: "Stack & Queue", description: "Learn stack and queue implementations and applications", durationHours: duration1, category: .dataStructures, resources: ["GeeksforGeeks", "YouTube tutorials"]),
+            TimeBlock(title: "Dynamic Programming", description: "Practice DP problems and pattern recognition", durationHours: duration1, category: .coding, resources: ["LeetCode DP problems", "DP guides"]),
+            TimeBlock(title: "Project Work", description: "Work on personal iOS project for portfolio", durationHours: duration2, category: .projectWork, resources: ["Swift documentation", "SwiftUI tutorials"]),
+            TimeBlock(title: "Git & Version Control", description: "Practice Git workflows and collaboration", durationHours: duration2, category: .coding, resources: ["Git handbook", "Version control best practices"])
+        ]
+        
+        // Thursday options
+        let thursdayOptions = [
+            TimeBlock(title: "Trees & Graphs", description: "Study tree traversals and basic graph algorithms", durationHours: duration1, category: .dataStructures, resources: ["Binary tree visualizer", "Graph theory basics"]),
+            TimeBlock(title: "Graph Algorithms", description: "Learn BFS, DFS, and shortest path algorithms", durationHours: duration1, category: .dataStructures, resources: ["Graph algorithms", "Visualizations"]),
+            TimeBlock(title: "Mock Interview", description: "Practice with a peer or use Pramp", durationHours: duration2, category: .mockInterview, resources: ["Pramp", "Interviewing.io"]),
+            TimeBlock(title: "Whiteboard Practice", description: "Practice coding on a whiteboard", durationHours: duration2, category: .coding, resources: ["Practice problems", "Timed exercises"])
+        ]
+        
+        // Friday options
+        let fridayOptions = [
+            TimeBlock(title: "Weekly Review", description: "Review all problems solved this week and identify patterns", durationHours: duration1, category: .review, resources: ["Personal notes", "Anki flashcards"]),
+            TimeBlock(title: "Debugging Skills", description: "Practice debugging techniques and reading code", durationHours: duration1, category: .coding, resources: ["Debugging exercises", "Code reading practice"]),
+            TimeBlock(title: "System Design Reading", description: "Read about scalable system design concepts", durationHours: duration2, category: .systemDesign, resources: ["System Design Primer", "Grokking System Design"]),
+            TimeBlock(title: "Testing & Quality", description: "Learn about testing strategies and code quality", durationHours: duration2, category: .coding, resources: ["Testing guides", "Code quality"])
+        ]
+        
+        return TaskPool(
+            monday: mondayOptions,
+            tuesday: tuesdayOptions,
+            wednesday: wednesdayOptions,
+            thursday: thursdayOptions,
+            friday: fridayOptions
+        )
+    }
+    
+    private func selectRandomTasks(from pool: [TimeBlock], count: Int, using random: inout SeedableRandomGenerator) -> [TimeBlock] {
+        guard pool.count >= count else { return pool }
+        var selected: Set<Int> = []
+        var result: [TimeBlock] = []
+        
+        while selected.count < count {
+            let index = random.nextInt(upperBound: pool.count)
+            if !selected.contains(index) {
+                selected.insert(index)
+                result.append(pool[index])
+            }
+        }
+        
+        return result
     }
     
     private func createMockPrepPack() -> PrepPack {
@@ -485,6 +491,27 @@ class NetworkService {
         if profile.timeBudgetHoursPerDay <= 0 || profile.timeBudgetHoursPerDay > 24 {
             print("⚠️ Warning: Invalid time budget: \(profile.timeBudgetHoursPerDay) hours")
         }
+    }
+}
+
+// MARK: - Random Number Generator
+
+/// Seedable random number generator to ensure variety in mock routines
+private struct SeedableRandomGenerator {
+    private var state: UInt64
+    
+    init(seed: UInt64) {
+        self.state = seed
+    }
+    
+    mutating func nextInt(upperBound: Int) -> Int {
+        state = state &* 1103515245 &+ 12345
+        return Int(state % UInt64(upperBound))
+    }
+    
+    mutating func nextDouble() -> Double {
+        state = state &* 1103515245 &+ 12345
+        return Double(state) / Double(UInt64.max)
     }
 }
 

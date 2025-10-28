@@ -134,7 +134,7 @@ router.post('/routine', async (req, res, next) => {
       }
 
       // Log LLM interaction for safety evaluation
-      logLLMInteraction({
+      await logLLMInteraction({
         traceId: req.traceId,
         model: config.openaiModel,
         prompt: user,
@@ -229,7 +229,7 @@ router.post('/prep', async (req, res, next) => {
       }
 
       // Log LLM interaction for safety evaluation
-      logLLMInteraction({
+      await logLLMInteraction({
         traceId: req.traceId,
         model: config.openaiModel,
         prompt: user,
@@ -345,7 +345,7 @@ router.post('/:section', async (req, res, next) => {
       }
 
       // Log interaction
-      logLLMInteraction({
+      await logLLMInteraction({
         traceId: req.traceId,
         model: config.openaiModel,
         prompt: user,
