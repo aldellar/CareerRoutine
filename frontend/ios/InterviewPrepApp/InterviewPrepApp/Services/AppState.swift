@@ -215,15 +215,31 @@ class AppState: ObservableObject {
         
         let todayTasks = dailyTasks.filter { calendar.isDate($0.date, inSameDayAs: today) }
         
+        print("🔍 getTasksForToday() called")
+        print("   - Found \(todayTasks.count) daily tasks for today")
+        print("   - Current routine exists: \(currentRoutine != nil)")
+        
+        if let routine = currentRoutine {
+            print("   - Routine has schedule for: \(routine.weeklySchedule.keys)")
+            for (day, blocks) in routine.weeklySchedule {
+                print("     \(day): \(blocks.count) blocks")
+                for block in blocks {
+                    print("       - '\(block.title)' - \(block.durationHours) hours")
+                }
+            }
+        }
+        
         return todayTasks.compactMap { task in
             guard let routine = currentRoutine else { return nil }
             
             // Find the corresponding time block
             for (_, blocks) in routine.weeklySchedule {
                 if let block = blocks.first(where: { $0.id == task.timeBlockId }) {
+                    print("   ✅ Matched task with block '\(block.title)' - \(block.durationHours) hours")
                     return (task, block)
                 }
             }
+            print("   ❌ Could not find block for task ID: \(task.timeBlockId)")
             return nil
         }
     }

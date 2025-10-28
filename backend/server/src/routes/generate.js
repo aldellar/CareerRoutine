@@ -25,6 +25,7 @@ import {
   addSafetyGuidelines,
   logLLMInteraction,
 } from '../services/safety.js';
+import { normalizePlanDurations } from '../utils/normalizeDurations.js';
 
 const router = express.Router();
 
@@ -96,6 +97,29 @@ router.post('/routine', async (req, res, next) => {
 
       // Filter unsafe content from plan
       plan = filterLLMOutput(plan, 'plan');
+
+      // Log before normalization for debugging
+      logger.info(
+        { 
+          traceId: req.traceId, 
+          profileBudget: profile.timeBudgetHoursPerDay,
+          hasTimeBlocks: !!plan.timeBlocks,
+          sampleDay: Object.keys(plan.timeBlocks || {})[0]
+        }, 
+        'Before normalization'
+      );
+
+      // Normalize durations to ensure they sum to daily budget
+      plan = normalizePlanDurations(plan, profile, req.traceId);
+      
+      // Log after normalization
+      logger.info(
+        { 
+          traceId: req.traceId,
+          normalized: true
+        }, 
+        'After normalization'
+      );
 
       // Validate data quality (including time budget)
       const qualityCheck = validateDataQuality(plan, 'plan', profile);
@@ -304,6 +328,14 @@ router.post('/:section', async (req, res, next) => {
         const error = new Error(`Response missing expected section: ${section}`);
         error.statusCode = 502;
         throw error;
+      }
+
+      // Normalize durations if rerolling timeBlocks
+      if (section === 'timeBlocks') {
+        // Merge the rerolled section into the current plan temporarily for normalization
+        const tempPlan = { ...currentPlan, timeBlocks: result.timeBlocks };
+        const normalizedPlan = normalizePlanDurations(tempPlan, profile, req.traceId);
+        result.timeBlocks = normalizedPlan.timeBlocks;
       }
 
       // Check if safe to return

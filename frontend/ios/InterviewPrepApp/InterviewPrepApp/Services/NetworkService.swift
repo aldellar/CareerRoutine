@@ -46,7 +46,7 @@ class NetworkService {
             // Mock mode for offline development
             print("   - Using MOCK data (8 second delay)")
             try await Task.sleep(nanoseconds: 8_000_000_000)
-            return createMockRoutine()
+            return createMockRoutine(for: profile)
         }
         
         // REAL API CALL with safety handling
@@ -59,7 +59,7 @@ class NetworkService {
             // Validate response quality
             if apiPlan.timeBlocks.isEmpty {
                 print("⚠️ Warning: Empty response from API, using fallback")
-                return createMockRoutine()
+                return createMockRoutine(for: profile)
             }
             
             print("   - ✅ API response received, converting to Routine")
@@ -68,7 +68,7 @@ class NetworkService {
         } catch {
             print("⚠️ API call failed: \(error.localizedDescription)")
             print("   - Using fallback routine")
-            return createMockRoutine()
+            return createMockRoutine(for: profile)
         }
     }
     
@@ -133,18 +133,26 @@ class NetworkService {
     func regenerateTimeAllocations(profile: UserProfile, currentRoutine: Routine) async throws -> Routine {
         // TODO: Connect to backend reroll API
         // For now, return mock data
-        return createMockRoutine()
+        return createMockRoutine(for: profile)
     }
     
     // MARK: - API Response Conversion
     
     private func convertToRoutine(_ apiPlan: APIPlan) -> Routine {
+        print("📋 convertToRoutine() called")
         var weeklySchedule: [Weekday: [TimeBlock]] = [:]
         
         for (dayStr, apiBlocks) in apiPlan.timeBlocks {
-            guard let weekday = weekdayFrom(dayStr) else { continue }
+            guard let weekday = weekdayFrom(dayStr) else { 
+                print("⚠️ Could not convert day string: \(dayStr)")
+                continue 
+            }
+            
+            print("📅 Processing \(dayStr): \(apiBlocks.count) blocks")
+            
             weeklySchedule[weekday] = apiBlocks.map { block in
-                TimeBlock(
+                print("   - Block: '\(block.label)' - \(block.durationHours) hours")
+                return TimeBlock(
                     title: block.label,
                     description: block.label,
                     durationHours: block.durationHours,
@@ -254,19 +262,34 @@ class NetworkService {
     
     // MARK: - Mock Data Generators (for frontend-only development)
     
-    private func createMockRoutine() -> Routine {
+    private func createMockRoutine(for profile: UserProfile) -> Routine {
+        print("📝 createMockRoutine() called")
+        print("   - Profile time budget: \(profile.timeBudgetHoursPerDay) hours")
+        
+        // Use profile's time budget
+        let timeBudget = profile.timeBudgetHoursPerDay
+        
+        // Calculate durations that sum exactly to time budget
+        // For 2 hours: split into 1.25h and 0.75h (or similar)
+        let taskDuration1 = round(timeBudget * 0.6 * 4) / 4  // Round to 0.25h
+        let taskDuration2 = timeBudget - taskDuration1  // Ensure exact sum
+        
+        print("   - Task duration 1: \(taskDuration1) hours")
+        print("   - Task duration 2: \(taskDuration2) hours")
+        print("   - Total: \(taskDuration1 + taskDuration2) hours")
+        
         let mondayBlocks = [
             TimeBlock(
                 title: "Arrays & Strings Review",
                 description: "Review fundamental array and string manipulation techniques",
-                durationHours: 1.5,
+                durationHours: taskDuration1,
                 category: .dataStructures,
                 resources: ["LeetCode Easy problems", "Cracking the Coding Interview Ch. 1"]
             ),
             TimeBlock(
                 title: "Coding Practice",
                 description: "Solve 2-3 easy problems on LeetCode",
-                durationHours: 1.5,
+                durationHours: taskDuration2,
                 category: .coding,
                 resources: ["LeetCode", "HackerRank"]
             )
@@ -276,14 +299,14 @@ class NetworkService {
             TimeBlock(
                 title: "Linked Lists",
                 description: "Study linked list operations and common patterns",
-                durationHours: 1.5,
+                durationHours: taskDuration1,
                 category: .dataStructures,
                 resources: ["Visualgo.net", "LeetCode patterns"]
             ),
             TimeBlock(
                 title: "Behavioral Prep",
                 description: "Prepare STAR stories for common behavioral questions",
-                durationHours: 1.0,
+                durationHours: taskDuration2,
                 category: .behavioral,
                 resources: ["Amazon Leadership Principles", "Google's hiring guide"]
             )
@@ -293,14 +316,14 @@ class NetworkService {
             TimeBlock(
                 title: "Stack & Queue",
                 description: "Learn stack and queue implementations and applications",
-                durationHours: 1.5,
+                durationHours: taskDuration1,
                 category: .dataStructures,
                 resources: ["GeeksforGeeks", "YouTube tutorials"]
             ),
             TimeBlock(
                 title: "Project Work",
                 description: "Work on personal iOS project for portfolio",
-                durationHours: 2.0,
+                durationHours: taskDuration2,
                 category: .projectWork,
                 resources: ["Swift documentation", "SwiftUI tutorials"]
             )
@@ -310,14 +333,14 @@ class NetworkService {
             TimeBlock(
                 title: "Trees & Graphs",
                 description: "Study tree traversals and basic graph algorithms",
-                durationHours: 2.0,
+                durationHours: taskDuration1,
                 category: .dataStructures,
                 resources: ["Binary tree visualizer", "Graph theory basics"]
             ),
             TimeBlock(
                 title: "Mock Interview",
                 description: "Practice with a peer or use Pramp",
-                durationHours: 1.0,
+                durationHours: taskDuration2,
                 category: .mockInterview,
                 resources: ["Pramp", "Interviewing.io"]
             )
@@ -327,14 +350,14 @@ class NetworkService {
             TimeBlock(
                 title: "Weekly Review",
                 description: "Review all problems solved this week and identify patterns",
-                durationHours: 1.5,
+                durationHours: taskDuration1,
                 category: .review,
                 resources: ["Personal notes", "Anki flashcards"]
             ),
             TimeBlock(
                 title: "System Design Reading",
                 description: "Read about scalable system design concepts",
-                durationHours: 1.5,
+                durationHours: taskDuration2,
                 category: .systemDesign,
                 resources: ["System Design Primer", "Grokking System Design"]
             )

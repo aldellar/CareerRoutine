@@ -88,11 +88,11 @@ User Profile:
 Current Plan Week: ${currentPlan.weekOf}
 
 REQUIREMENTS:
-- Create NEW time blocks (45-60 min each with 15-min breaks)
-- Allocate ${profile.timeBudgetHoursPerDay} hours per day across 3-4 blocks
+- Create NEW time blocks with durations that roughly sum to ${profile.timeBudgetHoursPerDay} hours per day
+- Each block should be 0.25 to 2.0 hours
 - Cover Monday through Friday minimum
 - Include: DS&A, Role-specific prep, Portfolio, Applications (daily)
-- Use realistic 24-hour format times (e.g., 09:00-09:45)
+- Durations will be normalized automatically to ensure exact sum to daily budget
 - Create empty arrays for days not in availableDays
 - Make blocks DIFFERENT from current plan but same quality
 
