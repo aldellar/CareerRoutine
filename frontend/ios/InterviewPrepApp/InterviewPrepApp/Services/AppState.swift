@@ -107,14 +107,99 @@ class AppState: ObservableObject {
     
     func updateTaskStatus(_ taskId: UUID, status: TaskStatus) {
         if let index = dailyTasks.firstIndex(where: { $0.id == taskId }) {
+            let oldStatus = dailyTasks[index].status
             dailyTasks[index].status = status
             storageService.saveDailyTasks(dailyTasks)
             
-            // Update streak if task is completed
-            if status == .done {
-                updateStreak()
+            // Update completion count and streak based on status change
+            updateCompletionCountAndStreak(oldStatus: oldStatus, newStatus: status)
+        }
+    }
+    
+    private func updateCompletionCountAndStreak(oldStatus: TaskStatus, newStatus: TaskStatus) {
+        if oldStatus == .done && newStatus != .done {
+            // Unmarking a task - decrement total and potentially update streak
+            streakData.totalTasksCompleted = max(0, streakData.totalTasksCompleted - 1)
+            updateStreakForUnmarking()
+            storageService.saveStreakData(streakData)
+        } else if newStatus == .done && oldStatus != .done {
+            // Marking a task as done - increment total and update streak
+            updateStreak()
+        }
+    }
+    
+    private func updateStreakForUnmarking() {
+        let calendar = Calendar.current
+        let today = Date()
+        
+        // Check if there are any completed tasks for today
+        let todayTasks = getTasksForToday()
+        let hasCompletedToday = todayTasks.contains { $0.task.status == .done }
+        
+        // If no tasks completed today, check if we need to adjust the streak
+        if !hasCompletedToday {
+            if let lastDate = streakData.lastCompletedDate {
+                let todayStartOfDay = calendar.startOfDay(for: today)
+                let lastDateStartOfDay = calendar.startOfDay(for: lastDate)
+                
+                // If last completed date was today, we need to handle the streak
+                if calendar.isDate(todayStartOfDay, inSameDayAs: lastDateStartOfDay) {
+                    // Check if there were any completed tasks on previous days
+                    let allTasksCompleted = getTotalCompletedTasks()
+                    
+                    if allTasksCompleted == 0 {
+                        // No tasks completed at all, reset streak
+                        streakData.currentStreak = 0
+                        streakData.lastCompletedDate = nil
+                    } else {
+                        // Find the most recent completion date
+                        let recentCompletions = dailyTasks.filter { $0.status == .done }
+                        if let mostRecentDate = recentCompletions.map({ $0.date }).max() {
+                            streakData.lastCompletedDate = mostRecentDate
+                            
+                            // Recalculate streak from the most recent completion
+                            recalculateStreakFrom(mostRecentDate)
+                        } else {
+                            streakData.lastCompletedDate = nil
+                        }
+                    }
+                }
             }
         }
+    }
+    
+    private func getTotalCompletedTasks() -> Int {
+        return dailyTasks.filter { $0.status == .done }.count
+    }
+    
+    private func recalculateStreakFrom(_ lastCompletedDate: Date) {
+        let calendar = Calendar.current
+        
+        // Group completed tasks by date
+        let completedTasksByDate = Dictionary(grouping: dailyTasks.filter { $0.status == .done }) { task in
+            calendar.startOfDay(for: task.date)
+        }
+        
+        // Count consecutive days going backwards from the most recent completion
+        var currentStreak = 0
+        var dateToCheck = calendar.startOfDay(for: lastCompletedDate)
+        
+        // Check up to 30 days back to find the streak
+        for _ in 0..<30 {
+            if let tasksForDate = completedTasksByDate[dateToCheck], !tasksForDate.isEmpty {
+                currentStreak += 1
+            } else {
+                break
+            }
+            
+            if let prevDay = calendar.date(byAdding: .day, value: -1, to: dateToCheck) {
+                dateToCheck = prevDay
+            } else {
+                break
+            }
+        }
+        
+        streakData.currentStreak = max(0, currentStreak)
     }
     
     func addTaskNote(_ taskId: UUID, note: String) {
@@ -149,19 +234,25 @@ class AppState: ObservableObject {
         let calendar = Calendar.current
         let today = Date()
         
+        // Get start of day for both dates to compare days without time
+        let todayStartOfDay = calendar.startOfDay(for: today)
+        
         streakData.totalTasksCompleted += 1
         
         if let lastDate = streakData.lastCompletedDate {
-            let daysDifference = calendar.dateComponents([.day], from: lastDate, to: today).day ?? 0
+            let lastDateStartOfDay = calendar.startOfDay(for: lastDate)
+            let daysDifference = calendar.dateComponents([.day], from: lastDateStartOfDay, to: todayStartOfDay).day ?? 0
             
             if daysDifference == 0 {
-                // Same day, don't update streak
+                // Same day, don't update streak but still update lastCompletedDate timestamp
+                streakData.lastCompletedDate = today
+                storageService.saveStreakData(streakData)
                 return
             } else if daysDifference == 1 {
                 // Consecutive day
                 streakData.currentStreak += 1
             } else {
-                // Streak broken
+                // Streak broken (more than 1 day gap)
                 streakData.currentStreak = 1
             }
         } else {
